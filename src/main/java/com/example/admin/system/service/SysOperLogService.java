@@ -19,4 +19,9 @@ public class SysOperLogService extends ServiceImpl<SysOperLogMapper, SysOperLog>
                 .orderByDesc(SysOperLog::getId)
                 .list();
     }
+
+    /** 最近 N 条日志（首页 Dashboard 用） */
+    public List<SysOperLog> listLatest(int limit) {
+        return lambdaQuery().orderByDesc(SysOperLog::getId).last("limit " + limit).list();
+    }
 }
