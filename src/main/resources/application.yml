@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: vaadin-admin
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/vaadin_admin?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+
+mybatis-plus:
+  global-config:
+    banner: false
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+sa-token:
+  # token 名称（同时也是 cookie 名称）
+  token-name: satoken
+  # token 有效期（秒），默认 1 天
+  timeout: 86400
+  # 是否允许同一账号多地同时登录
+  is-concurrent: true
+  # 多地登录时是否共用一个 token
+  is-share: false
+  is-log: false
+
+vaadin:
+  # 限定 Vaadin 类扫描范围，加快启动
+  allowed-packages: com.example.admin
