@@ -67,4 +67,14 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
         removeById(userId);
         userRoleMapper.delete(Wrappers.<SysUserRole>lambdaQuery().eq(SysUserRole::getUserId, userId));
     }
+
+    /** 用户自主修改密码：校验原密码后更新 */
+    public void changePassword(Long userId, String oldPassword, String newPassword) {
+        SysUser user = getById(userId);
+        if (user == null || !BCrypt.checkpw(oldPassword, user.getPassword())) {
+            throw new RuntimeException("原密码错误");
+        }
+        user.setPassword(BCrypt.hashpw(newPassword));
+        updateById(user);
+    }
 }

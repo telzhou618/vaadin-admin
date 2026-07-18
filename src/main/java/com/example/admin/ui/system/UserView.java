@@ -19,11 +19,17 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -46,23 +52,32 @@ public class UserView extends VerticalLayout {
         this.roleService = roleService;
         setSizeFull();
 
+        H2 title = new H2("用户管理");
+        title.getStyle().set("margin", "0").set("font-size", "var(--lumo-font-size-xl)");
+
         keyword.setPlaceholder("用户名 / 昵称");
         keyword.setClearButtonVisible(true);
+        keyword.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+        keyword.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         keyword.addKeyPressListener(Key.ENTER, e -> refresh());
         Button search = new Button("搜索", e -> refresh());
-        Button add = new Button("新增用户", e -> openDialog(new SysUser(), List.of()));
-        add.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        HorizontalLayout toolbar = new HorizontalLayout(keyword, search, add);
-        toolbar.setDefaultVerticalComponentAlignment(Alignment.BASELINE);
+        search.addThemeVariants(ButtonVariant.LUMO_SMALL);
+        Button add = new Button("新增用户", new Icon(VaadinIcon.PLUS), e -> openDialog(new SysUser(), List.of()));
+        add.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+        HorizontalLayout toolbar = new HorizontalLayout(title, keyword, search, add);
+        toolbar.setWidthFull();
+        toolbar.expand(title);
+        toolbar.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
         grid.addColumn(SysUser::getId).setHeader("ID").setWidth("80px").setFlexGrow(0);
         grid.addColumn(SysUser::getUsername).setHeader("用户名");
         grid.addColumn(SysUser::getNickname).setHeader("昵称");
         grid.addColumn(SysUser::getEmail).setHeader("邮箱");
-        grid.addColumn(u -> Integer.valueOf(0).equals(u.getStatus()) ? "正常" : "停用").setHeader("状态");
+        grid.addComponentColumn(u -> statusBadge(u.getStatus())).setHeader("状态").setWidth("90px").setFlexGrow(0);
         grid.addColumn(u -> DateUtil.format(u.getCreateTime(), "yyyy-MM-dd HH:mm:ss")).setHeader("创建时间");
         grid.addComponentColumn(this::actionButtons).setHeader("操作").setWidth("230px").setFlexGrow(0);
         grid.setSizeFull();
+        grid.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 
         add(toolbar, grid);
         refresh();
@@ -83,6 +98,14 @@ public class UserView extends VerticalLayout {
         Button delete = new Button("删除", e -> confirmDelete(user));
         delete.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
         return new HorizontalLayout(edit, toggle, delete);
+    }
+
+    /** 状态徽标：绿色正常 / 红色停用 */
+    private Component statusBadge(Integer status) {
+        boolean enabled = Integer.valueOf(0).equals(status);
+        Span badge = new Span(enabled ? "正常" : "停用");
+        badge.getElement().getThemeList().add(enabled ? "badge success" : "badge error");
+        return badge;
     }
 
     private void refresh() {

@@ -13,6 +13,11 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -39,19 +44,26 @@ public class MenuView extends VerticalLayout {
         this.menuService = menuService;
         setSizeFull();
 
-        Button add = new Button("新增菜单", e -> openDialog(new SysMenu()));
-        add.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        H2 title = new H2("菜单管理");
+        title.getStyle().set("margin", "0").set("font-size", "var(--lumo-font-size-xl)");
+        Button add = new Button("新增菜单", new Icon(VaadinIcon.PLUS), e -> openDialog(new SysMenu()));
+        add.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+        HorizontalLayout toolbar = new HorizontalLayout(title, add);
+        toolbar.setWidthFull();
+        toolbar.expand(title);
+        toolbar.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
         tree.addHierarchyColumn(SysMenu::getName).setHeader("菜单名称");
         tree.addColumn(m -> typeName(m.getType())).setHeader("类型").setWidth("80px").setFlexGrow(0);
         tree.addColumn(SysMenu::getPath).setHeader("路由地址");
         tree.addColumn(SysMenu::getPerms).setHeader("权限标识");
         tree.addColumn(SysMenu::getSort).setHeader("排序").setWidth("80px").setFlexGrow(0);
-        tree.addColumn(m -> Integer.valueOf(0).equals(m.getStatus()) ? "正常" : "停用").setHeader("状态");
+        tree.addComponentColumn(m -> statusBadge(m.getStatus())).setHeader("状态").setWidth("90px").setFlexGrow(0);
         tree.addComponentColumn(this::actionButtons).setHeader("操作").setWidth("180px").setFlexGrow(0);
         tree.setSizeFull();
+        tree.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 
-        add(add, tree);
+        add(toolbar, tree);
         refresh();
     }
 
@@ -72,6 +84,14 @@ public class MenuView extends VerticalLayout {
         Button delete = new Button("删除", e -> confirmDelete(menu));
         delete.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
         return new HorizontalLayout(edit, delete);
+    }
+
+    /** 状态徽标：绿色正常 / 红色停用 */
+    private Component statusBadge(Integer status) {
+        boolean enabled = Integer.valueOf(0).equals(status);
+        Span badge = new Span(enabled ? "正常" : "停用");
+        badge.getElement().getThemeList().add(enabled ? "badge success" : "badge error");
+        return badge;
     }
 
     private void refresh() {

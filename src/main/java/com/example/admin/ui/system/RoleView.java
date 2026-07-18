@@ -15,6 +15,11 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -42,19 +47,26 @@ public class RoleView extends VerticalLayout {
         this.menuService = menuService;
         setSizeFull();
 
-        Button add = new Button("新增角色", e -> openDialog(new SysRole()));
-        add.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        H2 title = new H2("角色管理");
+        title.getStyle().set("margin", "0").set("font-size", "var(--lumo-font-size-xl)");
+        Button add = new Button("新增角色", new Icon(VaadinIcon.PLUS), e -> openDialog(new SysRole()));
+        add.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+        HorizontalLayout toolbar = new HorizontalLayout(title, add);
+        toolbar.setWidthFull();
+        toolbar.expand(title);
+        toolbar.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
         grid.addColumn(SysRole::getId).setHeader("ID").setWidth("80px").setFlexGrow(0);
         grid.addColumn(SysRole::getCode).setHeader("角色编码");
         grid.addColumn(SysRole::getName).setHeader("角色名称");
         grid.addColumn(SysRole::getDescription).setHeader("描述");
-        grid.addColumn(r -> Integer.valueOf(0).equals(r.getStatus()) ? "正常" : "停用").setHeader("状态");
+        grid.addComponentColumn(r -> statusBadge(r.getStatus())).setHeader("状态").setWidth("90px").setFlexGrow(0);
         grid.addColumn(r -> DateUtil.format(r.getCreateTime(), "yyyy-MM-dd HH:mm:ss")).setHeader("创建时间");
         grid.addComponentColumn(this::actionButtons).setHeader("操作").setWidth("180px").setFlexGrow(0);
         grid.setSizeFull();
+        grid.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 
-        add(add, grid);
+        add(toolbar, grid);
         refresh();
     }
 
@@ -64,6 +76,14 @@ public class RoleView extends VerticalLayout {
         Button delete = new Button("删除", e -> confirmDelete(role));
         delete.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
         return new HorizontalLayout(edit, delete);
+    }
+
+    /** 状态徽标：绿色正常 / 红色停用 */
+    private Component statusBadge(Integer status) {
+        boolean enabled = Integer.valueOf(0).equals(status);
+        Span badge = new Span(enabled ? "正常" : "停用");
+        badge.getElement().getThemeList().add(enabled ? "badge success" : "badge error");
+        return badge;
     }
 
     private void refresh() {
@@ -97,6 +117,7 @@ public class RoleView extends VerticalLayout {
         menuTree.addHierarchyColumn(SysMenu::getName).setHeader("菜单权限");
         menuTree.setSelectionMode(Grid.SelectionMode.MULTI);
         menuTree.setHeight("320px");
+        menuTree.addThemeVariants(GridVariant.LUMO_COMPACT);
         List<SysMenu> roots = menuService.tree();
         menuTree.setItems(roots, SysMenu::getChildren);
         menuTree.expandRecursively(roots, 10);
