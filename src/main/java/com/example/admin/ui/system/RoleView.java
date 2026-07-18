@@ -1,7 +1,6 @@
 package com.example.admin.ui.system;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
 import com.example.admin.security.RequiresPerm;
 import com.example.admin.system.entity.SysMenu;
 import com.example.admin.system.entity.SysRole;
@@ -21,6 +20,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.treegrid.TreeGrid;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -75,14 +75,22 @@ public class RoleView extends VerticalLayout {
         dialog.setHeaderTitle(role.getId() == null ? "新增角色" : "编辑角色");
 
         TextField code = new TextField("角色编码");
-        code.setValue(role.getCode() == null ? "" : role.getCode());
         code.setHelperText("如 admin，编码为 admin 的角色拥有全部权限");
         TextField name = new TextField("角色名称");
-        name.setValue(role.getName() == null ? "" : role.getName());
         TextField description = new TextField("描述");
-        description.setValue(role.getDescription() == null ? "" : role.getDescription());
         Checkbox enabled = new Checkbox("启用");
-        enabled.setValue(!Integer.valueOf(1).equals(role.getStatus()));
+
+        // Binder 绑定与校验：校验失败时错误信息红色显示在字段下方
+        Binder<SysRole> binder = new Binder<>(SysRole.class);
+        binder.forField(code).asRequired("角色编码不能为空").bind(SysRole::getCode, SysRole::setCode);
+        binder.forField(name).asRequired("角色名称不能为空").bind(SysRole::getName, SysRole::setName);
+        binder.bind(description, SysRole::getDescription, SysRole::setDescription);
+        binder.forField(enabled)
+                .withConverter(checked -> checked ? 0 : 1, status -> !Integer.valueOf(1).equals(status))
+                .bind(SysRole::getStatus, SysRole::setStatus);
+        code.setRequiredIndicatorVisible(true);
+        name.setRequiredIndicatorVisible(true);
+        binder.readBean(role);
 
         // 菜单树勾选分配权限
         TreeGrid<SysMenu> menuTree = new TreeGrid<>();
@@ -102,14 +110,9 @@ public class RoleView extends VerticalLayout {
 
         Button cancel = new Button("取消", e -> dialog.close());
         Button save = new Button("保存", e -> {
-            if (StrUtil.isBlank(code.getValue()) || StrUtil.isBlank(name.getValue())) {
-                Notification.show("角色编码和名称不能为空");
+            if (!binder.writeBeanIfValid(role)) {
                 return;
             }
-            role.setCode(code.getValue().trim());
-            role.setName(name.getValue().trim());
-            role.setDescription(StrUtil.trimToNull(description.getValue()));
-            role.setStatus(enabled.getValue() ? 0 : 1);
             try {
                 roleService.saveRole(role,
                         menuTree.getSelectedItems().stream().map(SysMenu::getId).toList());

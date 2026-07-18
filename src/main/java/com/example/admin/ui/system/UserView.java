@@ -1,6 +1,7 @@
 package com.example.admin.ui.system;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import com.example.admin.security.RequiresPerm;
 import com.example.admin.system.entity.SysRole;
@@ -23,6 +24,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -93,14 +95,10 @@ public class UserView extends VerticalLayout {
         dialog.setHeaderTitle(isNew ? "新增用户" : "编辑用户");
 
         TextField username = new TextField("用户名");
-        username.setValue(user.getUsername() == null ? "" : user.getUsername());
         TextField nickname = new TextField("昵称");
-        nickname.setValue(user.getNickname() == null ? "" : user.getNickname());
         TextField email = new TextField("邮箱");
-        email.setValue(user.getEmail() == null ? "" : user.getEmail());
         PasswordField password = new PasswordField(isNew ? "初始密码" : "重置密码（留空则不修改）");
         Checkbox enabled = new Checkbox("启用");
-        enabled.setValue(!Integer.valueOf(1).equals(user.getStatus()));
 
         List<SysRole> allRoles = roleService.list();
         MultiSelectComboBox<SysRole> roles = new MultiSelectComboBox<>("角色");
@@ -110,25 +108,42 @@ public class UserView extends VerticalLayout {
                 .filter(r -> roleIds.contains(r.getId()))
                 .collect(Collectors.toSet()));
 
+        // Binder 绑定与校验：校验失败时错误信息红色显示在字段下方
+        Binder<SysUser> binder = new Binder<>(SysUser.class);
+        binder.forField(username)
+                .asRequired("用户名不能为空")
+                .bind(SysUser::getUsername, SysUser::setUsername);
+        binder.bind(nickname, SysUser::getNickname, SysUser::setNickname);
+        binder.forField(email)
+                .withValidator(e -> StrUtil.isBlank(e) || Validator.isEmail(e), "邮箱格式不正确")
+                .bind(SysUser::getEmail, SysUser::setEmail);
+        var passwordBinding = binder.forField(password);
+        if (isNew) {
+            passwordBinding.asRequired("请设置初始密码");
+        }
+        passwordBinding.bind(SysUser::getPassword, SysUser::setPassword);
+        binder.forField(enabled)
+                .withConverter(checked -> checked ? 0 : 1, status -> !Integer.valueOf(1).equals(status))
+                .bind(SysUser::getStatus, SysUser::setStatus);
+
+        username.setRequiredIndicatorVisible(true);
+        if (isNew) {
+            password.setRequiredIndicatorVisible(true);
+        }
+
+        binder.readBean(user);
+        // 编辑时实体里是 BCrypt 密文，清空密码框；留空保存即不修改密码
+        password.clear();
+
         FormLayout form = new FormLayout(username, nickname, email, password, enabled, roles);
         form.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 2));
         dialog.add(form);
 
         Button cancel = new Button("取消", e -> dialog.close());
         Button save = new Button("保存", e -> {
-            if (StrUtil.isBlank(username.getValue())) {
-                Notification.show("用户名不能为空");
+            if (!binder.writeBeanIfValid(user)) {
                 return;
             }
-            if (isNew && StrUtil.isBlank(password.getValue())) {
-                Notification.show("请设置初始密码");
-                return;
-            }
-            user.setUsername(username.getValue().trim());
-            user.setNickname(StrUtil.trimToNull(nickname.getValue()));
-            user.setEmail(StrUtil.trimToNull(email.getValue()));
-            user.setPassword(StrUtil.trimToNull(password.getValue()));
-            user.setStatus(enabled.getValue() ? 0 : 1);
             try {
                 userService.saveUser(user, roles.getValue().stream().map(SysRole::getId).toList());
                 dialog.close();

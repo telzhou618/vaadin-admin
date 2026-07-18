@@ -1,6 +1,5 @@
 package com.example.admin.ui.system;
 
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.admin.security.RequiresPerm;
 import com.example.admin.system.entity.SysMenu;
@@ -21,6 +20,7 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.treegrid.TreeGrid;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -93,13 +93,8 @@ public class MenuView extends VerticalLayout {
         parent.setItemLabelGenerator(SysMenu::getName);
         parent.setClearButtonVisible(true);
         parent.setHelperText("留空为根节点");
-        candidates.stream()
-                .filter(m -> Objects.equals(m.getId(), menu.getParentId()))
-                .findFirst()
-                .ifPresent(parent::setValue);
 
         TextField name = new TextField("菜单名称");
-        name.setValue(menu.getName() == null ? "" : menu.getName());
         Select<Integer> type = new Select<>();
         type.setLabel("类型");
         type.setItems(0, 1, 2);
@@ -108,19 +103,43 @@ public class MenuView extends VerticalLayout {
             case 1 -> "菜单";
             default -> "按钮";
         });
-        type.setValue(menu.getType() == null ? 1 : menu.getType());
         TextField path = new TextField("路由地址");
-        path.setValue(menu.getPath() == null ? "" : menu.getPath());
         TextField icon = new TextField("图标");
-        icon.setValue(menu.getIcon() == null ? "" : menu.getIcon());
         icon.setHelperText("VaadinIcon 名称，如 cogs、user、key、list");
         TextField perms = new TextField("权限标识");
-        perms.setValue(menu.getPerms() == null ? "" : menu.getPerms());
         perms.setHelperText("如 sys:user，与 @RequiresPerm 对应");
         IntegerField sort = new IntegerField("排序");
-        sort.setValue(menu.getSort() == null ? 0 : menu.getSort());
         Checkbox enabled = new Checkbox("启用");
-        enabled.setValue(!Integer.valueOf(1).equals(menu.getStatus()));
+
+        // Binder 绑定与校验：校验失败时错误信息红色显示在字段下方
+        Binder<SysMenu> binder = new Binder<>(SysMenu.class);
+        binder.forField(parent)
+                .withConverter(m -> m == null ? 0L : m.getId(),
+                        id -> candidates.stream()
+                                .filter(c -> Objects.equals(c.getId(), id))
+                                .findFirst().orElse(null))
+                .bind(SysMenu::getParentId, SysMenu::setParentId);
+        binder.forField(name).asRequired("菜单名称不能为空").bind(SysMenu::getName, SysMenu::setName);
+        binder.forField(type).asRequired("请选择类型").bind(SysMenu::getType, SysMenu::setType);
+        binder.bind(path, SysMenu::getPath, SysMenu::setPath);
+        binder.bind(icon, SysMenu::getIcon, SysMenu::setIcon);
+        binder.bind(perms, SysMenu::getPerms, SysMenu::setPerms);
+        binder.forField(sort)
+                .withConverter(v -> v == null ? 0 : v, v -> v)
+                .bind(SysMenu::getSort, SysMenu::setSort);
+        binder.forField(enabled)
+                .withConverter(checked -> checked ? 0 : 1, status -> !Integer.valueOf(1).equals(status))
+                .bind(SysMenu::getStatus, SysMenu::setStatus);
+        name.setRequiredIndicatorVisible(true);
+
+        // 新增时的默认值
+        if (menu.getType() == null) {
+            menu.setType(1);
+        }
+        if (menu.getSort() == null) {
+            menu.setSort(0);
+        }
+        binder.readBean(menu);
 
         FormLayout form = new FormLayout(parent, name, type, path, icon, perms, sort, enabled);
         form.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 2));
@@ -128,18 +147,9 @@ public class MenuView extends VerticalLayout {
 
         Button cancel = new Button("取消", e -> dialog.close());
         Button save = new Button("保存", e -> {
-            if (StrUtil.isBlank(name.getValue())) {
-                Notification.show("菜单名称不能为空");
+            if (!binder.writeBeanIfValid(menu)) {
                 return;
             }
-            menu.setParentId(parent.getValue() == null ? 0L : parent.getValue().getId());
-            menu.setName(name.getValue().trim());
-            menu.setType(type.getValue());
-            menu.setPath(StrUtil.trimToNull(path.getValue()));
-            menu.setIcon(StrUtil.trimToNull(icon.getValue()));
-            menu.setPerms(StrUtil.trimToNull(perms.getValue()));
-            menu.setSort(sort.getValue() == null ? 0 : sort.getValue());
-            menu.setStatus(enabled.getValue() ? 0 : 1);
             menuService.saveOrUpdate(menu);
             dialog.close();
             refresh();
