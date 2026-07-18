@@ -50,7 +50,11 @@ public class MainLayout extends AppLayout {
         });
         logout.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
-        HorizontalLayout header = new HorizontalLayout(logo, nickname, changePwd, logout);
+        // 侧边菜单收起 / 展开切换
+        Button menuToggle = new Button(new Icon(VaadinIcon.MENU), e -> setDrawerOpened(!isDrawerOpened()));
+        menuToggle.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+
+        HorizontalLayout header = new HorizontalLayout(menuToggle, logo, nickname, changePwd, logout);
         header.setWidthFull();
         header.setPadding(true);
         header.expand(logo);
