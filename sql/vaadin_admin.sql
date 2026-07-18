@@ -79,6 +79,23 @@ create table sys_role_menu (
 ) engine = innodb comment '角色-菜单关联表';
 
 -- ----------------------------
+-- 操作日志表
+-- ----------------------------
+drop table if exists sys_oper_log;
+create table sys_oper_log (
+    id          bigint auto_increment primary key comment '主键',
+    username    varchar(50)  null comment '操作人',
+    operation   varchar(100) null comment '操作描述',
+    ip          varchar(50)  null comment '操作 IP',
+    status      tinyint      not null default 0 comment '状态：0 成功 1 失败',
+    error_msg   varchar(500) null comment '错误信息',
+    cost_ms     bigint       null comment '耗时（毫秒）',
+    create_time datetime     null comment '操作时间',
+    update_time datetime     null comment '更新时间',
+    deleted     tinyint      not null default 0 comment '逻辑删除：0 正常 1 已删除'
+) engine = innodb comment '操作日志表';
+
+-- ----------------------------
 -- 种子数据
 -- ----------------------------
 -- 超级管理员，密码 123456（BCrypt）
@@ -91,13 +108,14 @@ values (1, 'admin', '管理员', '系统管理员，拥有全部权限', 0, now(
 
 -- 菜单树
 insert into sys_menu (id, parent_id, name, type, path, icon, perms, sort, status, create_time, update_time) values
-(1, 0, '系统管理', 0, null,         'cogs', null,       1, 0, now(), now()),
-(2, 1, '用户管理', 1, 'system/user', 'user', 'sys:user', 1, 0, now(), now()),
-(3, 1, '角色管理', 1, 'system/role', 'key',  'sys:role', 2, 0, now(), now()),
-(4, 1, '菜单管理', 1, 'system/menu', 'list', 'sys:menu', 3, 0, now(), now());
+(1, 0, '系统管理', 0, null,         'cogs',      null,       1, 0, now(), now()),
+(2, 1, '用户管理', 1, 'system/user', 'user',      'sys:user', 1, 0, now(), now()),
+(3, 1, '角色管理', 1, 'system/role', 'key',       'sys:role', 2, 0, now(), now()),
+(4, 1, '菜单管理', 1, 'system/menu', 'list',      'sys:menu', 3, 0, now(), now()),
+(5, 1, '操作日志', 1, 'system/log',  'file',    'sys:log',  4, 0, now(), now());
 
 -- admin 用户关联 admin 角色
 insert into sys_user_role (user_id, role_id) values (1, 1);
 
 -- admin 角色关联全部菜单
-insert into sys_role_menu (role_id, menu_id) values (1, 1), (1, 2), (1, 3), (1, 4);
+insert into sys_role_menu (role_id, menu_id) values (1, 1), (1, 2), (1, 3), (1, 4), (1, 5);

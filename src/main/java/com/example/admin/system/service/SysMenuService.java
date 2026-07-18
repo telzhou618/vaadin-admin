@@ -2,6 +2,7 @@ package com.example.admin.system.service;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.admin.log.OperLog;
 import com.example.admin.system.entity.SysMenu;
 import com.example.admin.system.entity.SysRoleMenu;
 import com.example.admin.system.mapper.SysMenuMapper;
@@ -36,7 +37,14 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
                 .toList();
     }
 
+    /** 新增或更新菜单 */
+    @OperLog("保存菜单")
+    public void saveMenu(SysMenu menu) {
+        saveOrUpdate(menu);
+    }
+
     /** 删除菜单，有子菜单时不允许删除 */
+    @OperLog("删除菜单")
     @Transactional
     public void deleteMenu(Long menuId) {
         long children = count(Wrappers.<SysMenu>lambdaQuery().eq(SysMenu::getParentId, menuId));

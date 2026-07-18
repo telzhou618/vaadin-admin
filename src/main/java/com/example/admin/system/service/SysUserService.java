@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.BCrypt;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.admin.log.OperLog;
 import com.example.admin.system.entity.SysUser;
 import com.example.admin.system.entity.SysUserRole;
 import com.example.admin.system.mapper.SysUserMapper;
@@ -31,6 +32,7 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
     }
 
     /** 新增或更新用户，并重置其角色。密码留空表示不修改 */
+    @OperLog("保存用户")
     @Transactional
     public void saveUser(SysUser user, List<Long> roleIds) {
         long sameName = lambdaQuery()
@@ -62,6 +64,7 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
     }
 
     /** 删除用户及其角色关联 */
+    @OperLog("删除用户")
     @Transactional
     public void deleteUser(Long userId) {
         removeById(userId);
@@ -69,6 +72,7 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
     }
 
     /** 用户自主修改密码：校验原密码后更新 */
+    @OperLog("修改密码")
     public void changePassword(Long userId, String oldPassword, String newPassword) {
         SysUser user = getById(userId);
         if (user == null || !BCrypt.checkpw(oldPassword, user.getPassword())) {

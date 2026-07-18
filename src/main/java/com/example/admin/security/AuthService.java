@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.BCrypt;
 import com.example.admin.config.CaptchaConfig;
+import com.example.admin.log.OperLog;
 import com.example.admin.system.entity.SysMenu;
 import com.example.admin.system.entity.SysUser;
 import com.example.admin.system.service.SysMenuService;
@@ -24,6 +25,7 @@ public class AuthService {
     private final SysMenuService menuService;
 
     /** 登录（先校验验证码），失败抛出 RuntimeException */
+    @OperLog("登录")
     public void login(String username, String password, String captcha) {
         checkCaptcha(captcha);
         SysUser user = userService.lambdaQuery().eq(SysUser::getUsername, username).one();
@@ -47,6 +49,7 @@ public class AuthService {
     }
 
     /** 退出登录 */
+    @OperLog("退出登录")
     public void logout() {
         StpUtil.logout();
     }

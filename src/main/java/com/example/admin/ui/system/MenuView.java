@@ -170,7 +170,7 @@ public class MenuView extends VerticalLayout {
             if (!binder.writeBeanIfValid(menu)) {
                 return;
             }
-            menuService.saveOrUpdate(menu);
+            menuService.saveMenu(menu);
             dialog.close();
             refresh();
             Notification.show("保存成功");

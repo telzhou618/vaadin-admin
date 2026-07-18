@@ -3,6 +3,7 @@ package com.example.admin.system.service;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.admin.log.OperLog;
 import com.example.admin.system.entity.SysRole;
 import com.example.admin.system.entity.SysRoleMenu;
 import com.example.admin.system.entity.SysUserRole;
@@ -23,6 +24,7 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
     private final SysUserRoleMapper userRoleMapper;
 
     /** 新增或更新角色，并重置其菜单权限 */
+    @OperLog("保存角色")
     @Transactional
     public void saveRole(SysRole role, List<Long> menuIds) {
         long sameCode = lambdaQuery()
@@ -48,6 +50,7 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
     }
 
     /** 删除角色及其菜单、用户关联 */
+    @OperLog("删除角色")
     @Transactional
     public void deleteRole(Long roleId) {
         removeById(roleId);
