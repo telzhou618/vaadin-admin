@@ -14,12 +14,21 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import lombok.Data;
 
 @Route("login")
 @PageTitle("登录 - vaadin-admin")
 public class LoginView extends VerticalLayout {
+
+    @Data
+    private static class LoginForm {
+        private String username;
+        private String password;
+        private String captcha;
+    }
 
     public LoginView(AuthService authService) {
         setSizeFull();
@@ -43,6 +52,7 @@ public class LoginView extends VerticalLayout {
 
         TextField username = new TextField("用户名");
         username.setPrefixComponent(new Icon(VaadinIcon.USER));
+        username.setAutofocus(true);
         PasswordField password = new PasswordField("密码");
         password.setPrefixComponent(new Icon(VaadinIcon.LOCK));
 
@@ -66,6 +76,23 @@ public class LoginView extends VerticalLayout {
         password.setWidthFull();
         login.setWidthFull();
 
+        // Binder 校验：必填项错误红字显示在字段下方
+        Binder<LoginForm> binder = new Binder<>(LoginForm.class);
+        binder.forField(username)
+                .asRequired("请输入用户名")
+                .bind(LoginForm::getUsername, LoginForm::setUsername);
+        binder.forField(password)
+                .asRequired("请输入密码")
+                .bind(LoginForm::getPassword, LoginForm::setPassword);
+        binder.forField(captcha)
+                .asRequired("请输入验证码")
+                .bind(LoginForm::getCaptcha, LoginForm::setCaptcha);
+        username.setRequiredIndicatorVisible(true);
+        password.setRequiredIndicatorVisible(true);
+        captcha.setRequiredIndicatorVisible(true);
+        LoginForm form = new LoginForm();
+        binder.readBean(form);
+
         VerticalLayout card = new VerticalLayout(logo, title, subtitle, username, password, captchaRow, login);
         card.setWidth("380px");
         card.setAlignItems(Alignment.CENTER);
@@ -79,13 +106,17 @@ public class LoginView extends VerticalLayout {
 
         login.addClickShortcut(Key.ENTER);
         login.addClickListener(e -> {
+            if (!binder.writeBeanIfValid(form)) {
+                return;
+            }
             try {
-                authService.login(username.getValue(), password.getValue(), captcha.getValue());
+                authService.login(form.getUsername(), form.getPassword(), form.getCaptcha());
                 login.getUI().ifPresent(ui -> ui.navigate(HomeView.class));
             } catch (Exception ex) {
                 Notification.show(ex.getMessage(), 3000, Notification.Position.TOP_CENTER);
-                // 验证码一次性有效，登录失败后刷新
+                // 验证码一次性有效，登录失败后刷新；同时清空密码和验证码输入
                 refreshCaptcha(captchaImage);
+                password.clear();
                 captcha.clear();
             }
         });
