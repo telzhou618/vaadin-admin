@@ -138,6 +138,7 @@ public class UserView extends VerticalLayout {
                 .bind(SysUser::getUsername, SysUser::setUsername);
         binder.bind(nickname, SysUser::getNickname, SysUser::setNickname);
         binder.forField(email)
+                .asRequired("邮箱不能为空")
                 .withValidator(e -> StrUtil.isBlank(e) || Validator.isEmail(e), "邮箱格式不正确")
                 .bind(SysUser::getEmail, SysUser::setEmail);
         var passwordBinding = binder.forField(password);
