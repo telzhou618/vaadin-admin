@@ -5,7 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import com.example.admin.security.AuthService;
 import com.example.admin.system.entity.SysMenu;
 import com.example.admin.system.entity.SysUser;
-import com.example.admin.system.service.SysUserService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -28,7 +27,7 @@ public class MainLayout extends AppLayout {
 
     private final Div footer = new Div();
 
-    public MainLayout(AuthService authService, SysUserService userService) {
+    public MainLayout(AuthService authService) {
         Icon logoIcon = new Icon(VaadinIcon.SHIELD);
         logoIcon.getStyle().set("color", "var(--lumo-primary-color)");
         H1 title = new H1("vaadin-admin");
@@ -38,17 +37,13 @@ public class MainLayout extends AppLayout {
 
         SysUser currentUser = authService.getCurrentUser();
         String name = currentUser.getNickname() == null ? currentUser.getUsername() : currentUser.getNickname();
-        Span nickname = new Span(new Icon(VaadinIcon.USER), new Span(name));
-        nickname.getStyle()
-                .set("display", "inline-flex")
-                .set("align-items", "center")
-                .set("gap", "var(--lumo-space-xs)")
+        // 点击昵称进入个人中心（修改资料、修改密码均在个人中心内）
+        Button profile = new Button(name, new Icon(VaadinIcon.USER),
+                e -> e.getSource().getUI().ifPresent(ui -> ui.navigate(ProfileView.class)));
+        profile.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        profile.getStyle()
                 .set("color", "var(--lumo-secondary-text-color)")
                 .set("font-size", "var(--lumo-font-size-s)");
-
-        Button changePwd = new Button("修改密码", new Icon(VaadinIcon.KEY),
-                e -> new ChangePasswordDialog(userService).open());
-        changePwd.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
         Button logout = new Button("退出", new Icon(VaadinIcon.SIGN_OUT), e -> {
             authService.logout();
@@ -60,7 +55,7 @@ public class MainLayout extends AppLayout {
         Button menuToggle = new Button(new Icon(VaadinIcon.MENU), e -> setDrawerOpened(!isDrawerOpened()));
         menuToggle.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
-        HorizontalLayout header = new HorizontalLayout(menuToggle, logo, nickname, changePwd, logout);
+        HorizontalLayout header = new HorizontalLayout(menuToggle, logo, profile, logout);
         header.setWidthFull();
         header.setPadding(true);
         header.expand(logo);

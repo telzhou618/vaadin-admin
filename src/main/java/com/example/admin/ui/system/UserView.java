@@ -18,17 +18,20 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
@@ -73,8 +76,13 @@ public class UserView extends VerticalLayout {
         toolbar.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
         grid.addColumn(SysUser::getId).setHeader("ID").setWidth("80px").setFlexGrow(0);
+        grid.addComponentColumn(u -> avatar(u.getAvatar())).setHeader("头像").setWidth("70px").setFlexGrow(0);
         grid.addColumn(SysUser::getUsername).setHeader("用户名");
         grid.addColumn(SysUser::getNickname).setHeader("昵称");
+        grid.addColumn(SysUser::getPhone).setHeader("手机号");
+        grid.addColumn(u -> genderText(u.getGender())).setHeader("性别").setWidth("70px").setFlexGrow(0);
+        grid.addColumn(u -> u.getBirthday() == null ? "" : u.getBirthday().toString())
+                .setHeader("生日");
         grid.addColumn(SysUser::getEmail).setHeader("邮箱");
         grid.addComponentColumn(u -> statusBadge(u.getStatus())).setHeader("状态").setWidth("90px").setFlexGrow(0);
         grid.addColumn(u -> DateUtil.format(u.getCreateTime(), "yyyy-MM-dd HH:mm:ss")).setHeader("创建时间");
@@ -111,6 +119,32 @@ public class UserView extends VerticalLayout {
         return badge;
     }
 
+    /** 头像：有地址显示圆形图片，无地址显示默认图标 */
+    private Component avatar(String url) {
+        if (StrUtil.isBlank(url)) {
+            Icon icon = new Icon(VaadinIcon.USER);
+            icon.getStyle().set("width", "28px").set("height", "28px")
+                    .set("color", "var(--lumo-contrast-50pct)");
+            return icon;
+        }
+        Image image = new Image(url, "头像");
+        image.setWidth("28px");
+        image.setHeight("28px");
+        image.getStyle().set("border-radius", "50%").set("object-fit", "cover");
+        return image;
+    }
+
+    private String genderText(Integer gender) {
+        if (gender == null) {
+            return "";
+        }
+        return switch (gender) {
+            case 0 -> "男";
+            case 1 -> "女";
+            default -> "保密";
+        };
+    }
+
     private void refresh() {
         paginationBar.refresh();
     }
@@ -129,6 +163,12 @@ public class UserView extends VerticalLayout {
         TextField username = new TextField("用户名");
         TextField nickname = new TextField("昵称");
         TextField email = new TextField("邮箱");
+        TextField phone = new TextField("手机号");
+        TextField avatar = new TextField("头像地址");
+        RadioButtonGroup<Integer> gender = new RadioButtonGroup<>("性别");
+        gender.setItems(0, 1, 2);
+        gender.setItemLabelGenerator(this::genderText);
+        DatePicker birthday = new DatePicker("生日");
         PasswordField password = new PasswordField(isNew ? "初始密码" : "重置密码（留空则不修改）");
         Checkbox enabled = new Checkbox("启用");
 
@@ -150,6 +190,12 @@ public class UserView extends VerticalLayout {
                 .asRequired("邮箱不能为空")
                 .withValidator(e -> StrUtil.isBlank(e) || Validator.isEmail(e), "邮箱格式不正确")
                 .bind(SysUser::getEmail, SysUser::setEmail);
+        binder.forField(phone)
+                .withValidator(p -> StrUtil.isBlank(p) || p.matches("\\d{11}"), "请输入 11 位手机号")
+                .bind(SysUser::getPhone, SysUser::setPhone);
+        binder.bind(avatar, SysUser::getAvatar, SysUser::setAvatar);
+        binder.forField(gender).bind(SysUser::getGender, SysUser::setGender);
+        binder.bind(birthday, SysUser::getBirthday, SysUser::setBirthday);
         var passwordBinding = binder.forField(password);
         if (isNew) {
             passwordBinding.asRequired("请设置初始密码");
@@ -168,7 +214,7 @@ public class UserView extends VerticalLayout {
         // 编辑时实体里是 BCrypt 密文，清空密码框；留空保存即不修改密码
         password.clear();
 
-        FormLayout form = new FormLayout(username, nickname, email, password, enabled, roles);
+        FormLayout form = new FormLayout(username, nickname, email, phone, gender, birthday, avatar, password, enabled, roles);
         form.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 2));
         dialog.add(form);
 

@@ -14,6 +14,10 @@ create table sys_user (
     password    varchar(100) not null comment '密码（BCrypt 密文）',
     nickname    varchar(50)  null comment '昵称',
     email       varchar(100) null comment '邮箱',
+    avatar      varchar(255) null comment '头像地址',
+    phone       varchar(11)  null comment '手机号（11 位）',
+    gender      tinyint      null comment '性别：0 男 1 女 2 保密',
+    birthday    date         null comment '生日',
     status      tinyint      not null default 0 comment '状态：0 正常 1 停用',
     create_time datetime     null comment '创建时间',
     update_time datetime     null comment '更新时间',
@@ -99,8 +103,8 @@ create table sys_oper_log (
 -- 种子数据
 -- ----------------------------
 -- 超级管理员，密码 123456（BCrypt）
-insert into sys_user (id, username, password, nickname, email, status, create_time, update_time)
-values (1, 'admin', '$2a$10$jD/M7YaW.fN5Wd3k6tR8gu6uhMZ.qvgr6tW5OSta5mYzdAVK2bSqS', '超级管理员', 'admin@example.com', 0, now(), now());
+insert into sys_user (id, username, password, nickname, email, phone, gender, birthday, status, create_time, update_time)
+values (1, 'admin', '$2a$10$jD/M7YaW.fN5Wd3k6tR8gu6uhMZ.qvgr6tW5OSta5mYzdAVK2bSqS', '超级管理员', 'admin@example.com', '13888888888', 0, '1990-01-01', 0, now(), now());
 
 -- 管理员角色（code=admin 的角色在代码中放行全部权限）
 insert into sys_role (id, code, name, description, status, create_time, update_time)
@@ -119,3 +123,13 @@ insert into sys_user_role (user_id, role_id) values (1, 1);
 
 -- admin 角色关联全部菜单
 insert into sys_role_menu (role_id, menu_id) values (1, 1), (1, 2), (1, 3), (1, 4), (1, 5);
+
+
+-- ----------------------------
+-- 已有数据库升级（sys_user 新增头像/手机号/性别/生日字段时执行）
+-- ----------------------------
+-- alter table sys_user
+--     add column avatar varchar(255) null comment '头像地址' after email,
+--     add column phone varchar(11) null comment '手机号（11 位）' after avatar,
+--     add column gender tinyint null comment '性别：0 男 1 女 2 保密' after phone,
+--     add column birthday date null comment '生日' after gender;

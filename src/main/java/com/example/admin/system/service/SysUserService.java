@@ -58,6 +58,20 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
         }
     }
 
+    /** 更新个人资料：仅允许修改这些字段，用户名和 ID 不可变 */
+    @OperLog("修改个人资料")
+    public void updateProfile(SysUser profile) {
+        lambdaUpdate()
+                .set(SysUser::getNickname, profile.getNickname())
+                .set(SysUser::getEmail, profile.getEmail())
+                .set(SysUser::getAvatar, profile.getAvatar())
+                .set(SysUser::getPhone, profile.getPhone())
+                .set(SysUser::getGender, profile.getGender())
+                .set(SysUser::getBirthday, profile.getBirthday())
+                .eq(SysUser::getId, profile.getId())
+                .update();
+    }
+
     /** 用户已分配的角色 id 列表 */
     public List<Long> getRoleIds(Long userId) {
         return userRoleMapper.selectList(Wrappers.<SysUserRole>lambdaQuery().eq(SysUserRole::getUserId, userId))
