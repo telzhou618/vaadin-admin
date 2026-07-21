@@ -12,6 +12,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
@@ -26,15 +27,16 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-/** 个人中心：展示当前登录用户的详细信息，可修改个人资料（用户名和 ID 除外）和密码 */
+/**
+ * 个人中心：展示当前登录用户的详细信息，可修改个人资料（用户名和 ID 除外）和密码
+ */
 @Route(value = "profile", layout = MainLayout.class)
 @PageTitle("个人中心 - vaadin-admin")
 public class ProfileView extends VerticalLayout {
 
     private final AuthService authService;
     private final SysUserService userService;
-    private final VerticalLayout avatarBox = new VerticalLayout();
-    private final VerticalLayout details = new VerticalLayout();
+    private final VerticalLayout content = new VerticalLayout();
 
     public ProfileView(AuthService authService, SysUserService userService) {
         this.authService = authService;
@@ -54,14 +56,12 @@ public class ProfileView extends VerticalLayout {
         toolbar.expand(title);
         toolbar.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
-        // 头像在上、字段逐行居中，内容占满页面并垂直居中
-        avatarBox.setPadding(false);
-        avatarBox.setSpacing(false);
-        avatarBox.setAlignItems(Alignment.CENTER);
-        details.setPadding(false);
-        details.setAlignItems(Alignment.CENTER);
-        details.getStyle().set("row-gap", "var(--lumo-space-s)");
-        VerticalLayout center = new VerticalLayout(avatarBox, details);
+        // 内容占满页面并垂直居中
+        content.setWidthFull();
+        content.setPadding(false);
+        content.setAlignItems(Alignment.CENTER);
+        content.getStyle().set("gap", "var(--lumo-space-l)");
+        VerticalLayout center = new VerticalLayout(content);
         center.setSizeFull();
         center.setPadding(false);
         center.setAlignItems(Alignment.CENTER);
@@ -72,25 +72,128 @@ public class ProfileView extends VerticalLayout {
         showDetails();
     }
 
-    /** 重新加载并展示当前用户信息 */
+    /**
+     * 重新加载并展示当前用户信息
+     */
     private void showDetails() {
         SysUser user = authService.getCurrentUser();
-        avatarBox.removeAll();
-        avatarBox.add(avatar(user.getAvatar(), "96px"));
-
-        details.removeAll();
-        details.add(
-                row("ID", String.valueOf(user.getId())),
-                row("用户名", user.getUsername()),
-                row("昵称", user.getNickname()),
-                row("性别", genderText(user.getGender())),
-                row("手机号", user.getPhone()),
-                row("邮箱", user.getEmail()),
-                row("生日", user.getBirthday() == null ? "" : user.getBirthday().toString()),
-                row("注册时间", DateUtil.format(user.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
+        content.removeAll();
+        content.add(hero(user), infoCard(user));
     }
 
-    /** 头像：有地址显示圆形图片，无地址显示默认图标 */
+    /**
+     * 顶部区域：渐变横幅 + 悬空圆形头像 + 昵称与用户名
+     */
+    private Component hero(SysUser user) {
+        Div banner = new Div();
+        banner.setWidthFull();
+        banner.setHeight("120px");
+        banner.getStyle()
+                .set("background", "linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)")
+                .set("border-radius", "var(--lumo-border-radius-l)");
+
+        Component avatar = avatar(user.getAvatar(), "120px");
+        avatar.getStyle()
+                .set("margin-top", "-64px")
+                .set("border", "4px solid var(--lumo-base-color)")
+                .set("border-radius", "50%")
+                .set("box-shadow", "var(--lumo-box-shadow-s)")
+                .set("box-sizing", "border-box")
+                .set("background", "var(--lumo-contrast-5pct)");
+
+        String displayName = user.getNickname() == null ? user.getUsername() : user.getNickname();
+        H2 nickname = new H2(displayName);
+        nickname.getStyle().set("margin", "0");
+        Span username = new Span("@" + user.getUsername());
+        username.getStyle()
+                .set("color", "var(--lumo-secondary-text-color)")
+                .set("font-size", "var(--lumo-font-size-s)");
+        VerticalLayout nameBox = new VerticalLayout(nickname, username);
+        nameBox.setPadding(false);
+        nameBox.setSpacing(false);
+        nameBox.setAlignItems(Alignment.CENTER);
+        nameBox.getStyle().set("margin-top", "var(--lumo-space-s)").set("row-gap", "var(--lumo-space-xs)");
+
+        VerticalLayout hero = new VerticalLayout(banner, avatar, nameBox);
+        hero.setWidthFull();
+        hero.setPadding(false);
+        hero.setSpacing(false);
+        hero.setAlignItems(Alignment.CENTER);
+        return hero;
+    }
+
+    /**
+     * 资料卡片：每个字段一行（图标 + 标签 + 值），行间细分隔线
+     */
+    private Component infoCard(SysUser user) {
+        VerticalLayout card = new VerticalLayout();
+        card.setWidth("720px");
+        card.setMaxWidth("100%");
+        card.setPadding(true);
+        card.getStyle()
+                .set("background", "var(--lumo-base-color)")
+                .set("border", "1px solid var(--lumo-contrast-10pct)")
+                .set("border-radius", "var(--lumo-border-radius-l)")
+                .set("box-shadow", "var(--lumo-box-shadow-s)")
+                .set("row-gap", "var(--lumo-space-s)");
+        card.add(
+                fieldRow(VaadinIcon.HASH, "ID", String.valueOf(user.getId()), false),
+                fieldRow(VaadinIcon.USER, "用户名", user.getUsername(), false),
+                fieldRow(VaadinIcon.TAG, "昵称", user.getNickname(), false),
+                fieldRow(genderIcon(user.getGender()), "性别", genderText(user.getGender()), false),
+                fieldRow(VaadinIcon.MOBILE, "手机号", user.getPhone(), false),
+                fieldRow(VaadinIcon.ENVELOPE, "邮箱", user.getEmail(), false),
+                fieldRow(VaadinIcon.CALENDAR, "生日",
+                        user.getBirthday() == null ? "" : user.getBirthday().toString(), false),
+                fieldRow(VaadinIcon.CLOCK, "注册时间",
+                        DateUtil.format(user.getCreateTime(), "yyyy-MM-dd HH:mm:ss"), true));
+        return card;
+    }
+
+    /**
+     * 字段行：主色图标 + 灰色标签 + 值（空值显示 —），行间分隔线
+     */
+    private Component fieldRow(VaadinIcon icon, String label, String value, boolean last) {
+        Icon leading = new Icon(icon);
+        leading.getStyle()
+                .set("width", "18px")
+                .set("height", "18px")
+                .set("flex-shrink", "0")
+                .set("color", "var(--lumo-primary-color)");
+        Span labelEl = new Span(label);
+        labelEl.getStyle()
+                .set("color", "var(--lumo-secondary-text-color)")
+                .set("width", "5.5em")
+                .set("flex-shrink", "0");
+        Span valueEl = new Span(StrUtil.isBlank(value) ? "—" : value);
+        valueEl.getStyle().set("font-weight", "500");
+        HorizontalLayout row = new HorizontalLayout(leading, labelEl, valueEl);
+        row.setWidthFull();
+        row.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+        if (!last) {
+            row.getStyle()
+                    .set("border-bottom", "1px solid var(--lumo-contrast-10pct)")
+                    .set("padding-bottom", "var(--lumo-space-s)");
+        }
+        return row;
+    }
+
+    /**
+     * 性别图标：男 / 女 / 保密
+     */
+    private VaadinIcon genderIcon(Integer gender) {
+        if (Integer.valueOf(0).equals(gender)) {
+            return VaadinIcon.MALE;
+        }
+        if (Integer.valueOf(1).equals(gender)) {
+            return VaadinIcon.FEMALE;
+        }
+        return VaadinIcon.INFO;
+    }
+
+    /**
+     * 头像：有地址显示圆形图片，无地址显示默认图标
+     */
     private Component avatar(String url, String size) {
         if (StrUtil.isBlank(url)) {
             Icon icon = new Icon(VaadinIcon.USER);
@@ -105,20 +208,6 @@ public class ProfileView extends VerticalLayout {
         return image;
     }
 
-    /** 详情行：灰色标签右对齐 + 值（空值显示 —），整行在页面居中 */
-    private Component row(String label, String value) {
-        Span labelEl = new Span(label);
-        labelEl.getStyle()
-                .set("color", "var(--lumo-secondary-text-color)")
-                .set("width", "5em")
-                .set("text-align", "right")
-                .set("flex-shrink", "0");
-        Span valueEl = new Span(StrUtil.isBlank(value) ? "—" : value);
-        HorizontalLayout row = new HorizontalLayout(labelEl, valueEl);
-        row.setDefaultVerticalComponentAlignment(Alignment.CENTER);
-        return row;
-    }
-
     private String genderText(Integer gender) {
         if (gender == null) {
             return "";
@@ -130,7 +219,9 @@ public class ProfileView extends VerticalLayout {
         };
     }
 
-    /** 编辑个人资料：用户名和 ID 不在表单中，服务端也按字段白名单更新 */
+    /**
+     * 编辑个人资料：用户名和 ID 不在表单中，服务端也按字段白名单更新
+     */
     private void openEditDialog() {
         SysUser user = authService.getCurrentUser();
         Dialog dialog = new Dialog();
