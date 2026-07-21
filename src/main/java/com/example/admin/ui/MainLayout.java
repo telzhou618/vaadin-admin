@@ -7,9 +7,11 @@ import com.example.admin.system.entity.SysMenu;
 import com.example.admin.system.entity.SysUser;
 import com.example.admin.system.service.SysUserService;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -19,8 +21,12 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 
+import java.time.Year;
+
 /** 主布局：顶部栏 + 按当前用户菜单动态生成的侧边导航 */
 public class MainLayout extends AppLayout {
+
+    private final Div footer = new Div();
 
     public MainLayout(AuthService authService, SysUserService userService) {
         Icon logoIcon = new Icon(VaadinIcon.SHIELD);
@@ -67,6 +73,30 @@ public class MainLayout extends AppLayout {
         nav.addItem(home);
         authService.getCurrentUserMenus().forEach(menu -> nav.addItem(toNavItem(menu)));
         addToDrawer(nav);
+
+        // 主内容区底部居中的版权信息
+        Span copyright = new Span("Copyright © " + Year.now().getValue() + " vaadin-admin 版权所有");
+        footer.add(copyright);
+        footer.getStyle()
+                .set("text-align", "center")
+                .set("padding", "var(--lumo-space-s)")
+                .set("color", "var(--lumo-secondary-text-color)")
+                .set("font-size", "var(--lumo-font-size-xs)");
+    }
+
+    /** 路由内容外包一层：视图占满剩余空间，版权信息固定在主页面底部居中 */
+    @Override
+    public void showRouterLayoutContent(HasElement content) {
+        Div viewContainer = new Div();
+        viewContainer.getElement().appendChild(content.getElement());
+        viewContainer.getStyle()
+                .set("flex", "1 1 auto")
+                .set("min-height", "0")
+                .set("overflow", "auto");
+        Div wrapper = new Div(viewContainer, footer);
+        wrapper.setSizeFull();
+        wrapper.getStyle().set("display", "flex").set("flex-direction", "column");
+        setContent(wrapper);
     }
 
     /** 菜单实体转导航项（目录渲染为可展开分组） */

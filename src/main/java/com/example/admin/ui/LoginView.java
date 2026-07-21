@@ -19,6 +19,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import lombok.Data;
 
+import java.time.Year;
+
 @Route("login")
 @PageTitle("登录 - vaadin-admin")
 public class LoginView extends VerticalLayout {
@@ -102,7 +104,12 @@ public class LoginView extends VerticalLayout {
                 .set("border-radius", "var(--lumo-border-radius-l)")
                 .set("box-shadow", "var(--lumo-box-shadow-l)")
                 .set("padding", "var(--lumo-space-l)");
-        add(card);
+        Span copyright = new Span("Copyright © " + Year.now().getValue() + " vaadin-admin 版权所有");
+        copyright.getStyle()
+                .set("color", "var(--lumo-secondary-text-color)")
+                .set("font-size", "var(--lumo-font-size-xs)")
+                .set("margin-top", "var(--lumo-space-m)");
+        add(card, copyright);
 
         login.addClickShortcut(Key.ENTER);
         login.addClickListener(e -> {
