@@ -54,22 +54,21 @@ public class ProfileView extends VerticalLayout {
         toolbar.expand(title);
         toolbar.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
+        // 头像在上、字段逐行居中，内容占满页面并垂直居中
         avatarBox.setPadding(false);
         avatarBox.setSpacing(false);
+        avatarBox.setAlignItems(Alignment.CENTER);
         details.setPadding(false);
+        details.setAlignItems(Alignment.CENTER);
         details.getStyle().set("row-gap", "var(--lumo-space-s)");
-        HorizontalLayout card = new HorizontalLayout(avatarBox, details);
-        card.setWidthFull();
-        card.setPadding(true);
-        card.setDefaultVerticalComponentAlignment(Alignment.START);
-        card.getStyle()
-                .set("background", "var(--lumo-base-color)")
-                .set("border", "1px solid var(--lumo-contrast-10pct)")
-                .set("border-radius", "var(--lumo-border-radius-l)")
-                .set("box-shadow", "var(--lumo-box-shadow-s)")
-                .set("gap", "var(--lumo-space-xl)");
+        VerticalLayout center = new VerticalLayout(avatarBox, details);
+        center.setSizeFull();
+        center.setPadding(false);
+        center.setAlignItems(Alignment.CENTER);
+        center.setJustifyContentMode(JustifyContentMode.CENTER);
 
-        add(toolbar, card);
+        add(toolbar, center);
+        expand(center);
         showDetails();
     }
 
@@ -106,12 +105,13 @@ public class ProfileView extends VerticalLayout {
         return image;
     }
 
-    /** 详情行：灰色标签 + 值（空值显示 —） */
+    /** 详情行：灰色标签右对齐 + 值（空值显示 —），整行在页面居中 */
     private Component row(String label, String value) {
         Span labelEl = new Span(label);
         labelEl.getStyle()
                 .set("color", "var(--lumo-secondary-text-color)")
                 .set("width", "5em")
+                .set("text-align", "right")
                 .set("flex-shrink", "0");
         Span valueEl = new Span(StrUtil.isBlank(value) ? "—" : value);
         HorizontalLayout row = new HorizontalLayout(labelEl, valueEl);
