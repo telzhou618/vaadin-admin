@@ -3,12 +3,14 @@ package com.example.admin.ui.system;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.admin.security.RequiresPerm;
 import com.example.admin.system.entity.SysRole;
 import com.example.admin.system.entity.SysUser;
 import com.example.admin.system.service.SysRoleService;
 import com.example.admin.system.service.SysUserService;
 import com.example.admin.ui.MainLayout;
+import com.example.admin.ui.PaginationBar;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -46,6 +48,7 @@ public class UserView extends VerticalLayout {
     private final SysRoleService roleService;
     private final Grid<SysUser> grid = new Grid<>(SysUser.class, false);
     private final TextField keyword = new TextField();
+    private final PaginationBar paginationBar = new PaginationBar(this::loadPage);
 
     public UserView(SysUserService userService, SysRoleService roleService) {
         this.userService = userService;
@@ -59,8 +62,8 @@ public class UserView extends VerticalLayout {
         keyword.setClearButtonVisible(true);
         keyword.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         keyword.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        keyword.addKeyPressListener(Key.ENTER, e -> refresh());
-        Button search = new Button("搜索", e -> refresh());
+        keyword.addKeyPressListener(Key.ENTER, e -> paginationBar.reset());
+        Button search = new Button("搜索", e -> paginationBar.reset());
         search.addThemeVariants(ButtonVariant.LUMO_SMALL);
         Button add = new Button("新增用户", new Icon(VaadinIcon.PLUS), e -> openDialog(new SysUser(), List.of()));
         add.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
@@ -79,7 +82,7 @@ public class UserView extends VerticalLayout {
         grid.setSizeFull();
         grid.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 
-        add(toolbar, grid);
+        add(toolbar, grid, paginationBar);
         refresh();
     }
 
@@ -109,7 +112,13 @@ public class UserView extends VerticalLayout {
     }
 
     private void refresh() {
-        grid.setItems(userService.listUsers(keyword.getValue()));
+        paginationBar.refresh();
+    }
+
+    private void loadPage(int page, int pageSize) {
+        Page<SysUser> result = userService.pageUsers(keyword.getValue(), page, pageSize);
+        grid.setItems(result.getRecords());
+        paginationBar.setTotal(result.getTotal());
     }
 
     private void openDialog(SysUser user, List<Long> roleIds) {

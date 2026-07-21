@@ -1,10 +1,12 @@
 package com.example.admin.ui.system;
 
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.admin.security.RequiresPerm;
 import com.example.admin.system.entity.SysOperLog;
 import com.example.admin.system.service.SysOperLogService;
 import com.example.admin.ui.MainLayout;
+import com.example.admin.ui.PaginationBar;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -30,6 +32,7 @@ public class OperLogView extends VerticalLayout {
     private final SysOperLogService operLogService;
     private final Grid<SysOperLog> grid = new Grid<>(SysOperLog.class, false);
     private final TextField keyword = new TextField();
+    private final PaginationBar paginationBar = new PaginationBar(this::loadPage);
 
     public OperLogView(SysOperLogService operLogService) {
         this.operLogService = operLogService;
@@ -42,8 +45,8 @@ public class OperLogView extends VerticalLayout {
         keyword.setClearButtonVisible(true);
         keyword.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         keyword.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        keyword.addKeyPressListener(Key.ENTER, e -> refresh());
-        Button search = new Button("搜索", e -> refresh());
+        keyword.addKeyPressListener(Key.ENTER, e -> paginationBar.reset());
+        Button search = new Button("搜索", e -> paginationBar.reset());
         search.addThemeVariants(ButtonVariant.LUMO_SMALL);
         HorizontalLayout toolbar = new HorizontalLayout(title, keyword, search);
         toolbar.setWidthFull();
@@ -62,7 +65,7 @@ public class OperLogView extends VerticalLayout {
         grid.setSizeFull();
         grid.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 
-        add(toolbar, grid);
+        add(toolbar, grid, paginationBar);
         refresh();
     }
 
@@ -75,6 +78,12 @@ public class OperLogView extends VerticalLayout {
     }
 
     private void refresh() {
-        grid.setItems(operLogService.listLogs(keyword.getValue()));
+        paginationBar.refresh();
+    }
+
+    private void loadPage(int page, int pageSize) {
+        Page<SysOperLog> result = operLogService.pageLogs(keyword.getValue(), page, pageSize);
+        grid.setItems(result.getRecords());
+        paginationBar.setTotal(result.getTotal());
     }
 }

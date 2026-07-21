@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.BCrypt;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.admin.log.OperLog;
 import com.example.admin.system.entity.SysUser;
@@ -22,13 +23,13 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
 
     private final SysUserRoleMapper userRoleMapper;
 
-    /** 按关键字（用户名/昵称）查询用户列表 */
-    public List<SysUser> listUsers(String keyword) {
+    /** 按关键字（用户名/昵称）分页查询用户列表 */
+    public Page<SysUser> pageUsers(String keyword, int page, int size) {
         return lambdaQuery()
                 .and(StrUtil.isNotBlank(keyword), q -> q
                         .like(SysUser::getUsername, keyword).or().like(SysUser::getNickname, keyword))
                 .orderByDesc(SysUser::getCreateTime)
-                .list();
+                .page(new Page<>(page, size));
     }
 
     /** 新增或更新用户，并重置其角色。密码留空表示不修改 */
