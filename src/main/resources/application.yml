@@ -9,6 +9,13 @@ spring:
     url: jdbc:mysql://localhost:3306/vaadin_admin?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: root
+  # Sa-Token 持久化使用的 Redis 连接
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      # password:
 
 mybatis-plus:
   global-config:
