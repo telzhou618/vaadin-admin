@@ -1,5 +1,6 @@
 package com.example.admin.security;
 
+import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.BCrypt;
@@ -7,8 +8,11 @@ import com.example.admin.config.CaptchaConfig;
 import com.example.admin.log.OperLog;
 import com.example.admin.system.entity.SysMenu;
 import com.example.admin.system.entity.SysUser;
+import com.example.admin.system.service.OnlineUserService;
 import com.example.admin.system.service.SysMenuService;
 import com.example.admin.system.service.SysUserService;
+import com.vaadin.flow.server.VaadinRequest;
+import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.WrappedSession;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +40,11 @@ public class AuthService {
             throw new RuntimeException("账号已被停用，请联系管理员");
         }
         StpUtil.login(user.getId());
+        // 在 token session 中记录本次登录的 IP 和时间，供在线用户监控展示
+        VaadinRequest request = VaadinService.getCurrentRequest();
+        SaSession tokenSession = StpUtil.getTokenSession();
+        tokenSession.set(OnlineUserService.SESSION_IP, request == null ? null : request.getRemoteAddr());
+        tokenSession.set(OnlineUserService.SESSION_LOGIN_TIME, System.currentTimeMillis());
     }
 
     /** 校验图形验证码（一次性，取出后立即失效，防止重放） */

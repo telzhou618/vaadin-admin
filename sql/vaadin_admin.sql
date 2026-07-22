@@ -116,13 +116,14 @@ insert into sys_menu (id, parent_id, name, type, path, icon, perms, sort, status
 (2, 1, '用户管理', 1, 'system/user', 'user',      'sys:user', 1, 0, now(), now()),
 (3, 1, '角色管理', 1, 'system/role', 'key',       'sys:role', 2, 0, now(), now()),
 (4, 1, '菜单管理', 1, 'system/menu', 'list',      'sys:menu', 3, 0, now(), now()),
-(5, 1, '操作日志', 1, 'system/log',  'file',    'sys:log',  4, 0, now(), now());
+(5, 1, '操作日志', 1, 'system/log',  'file',    'sys:log',  4, 0, now(), now()),
+(6, 1, '在线用户', 1, 'system/online', 'users',   'sys:online', 5, 0, now(), now());
 
 -- admin 用户关联 admin 角色
 insert into sys_user_role (user_id, role_id) values (1, 1);
 
 -- admin 角色关联全部菜单
-insert into sys_role_menu (role_id, menu_id) values (1, 1), (1, 2), (1, 3), (1, 4), (1, 5);
+insert into sys_role_menu (role_id, menu_id) values (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6);
 
 
 -- ----------------------------
@@ -133,3 +134,11 @@ insert into sys_role_menu (role_id, menu_id) values (1, 1), (1, 2), (1, 3), (1, 
 --     add column phone varchar(11) null comment '手机号（11 位）' after avatar,
 --     add column gender tinyint null comment '性别：0 男 1 女 2 保密' after phone,
 --     add column birthday date null comment '生日' after gender;
+
+
+-- ----------------------------
+-- 已有数据库升级（新增「在线用户」菜单时执行）
+-- ----------------------------
+-- insert into sys_menu (id, parent_id, name, type, path, icon, perms, sort, status, create_time, update_time)
+-- values (6, 1, '在线用户', 1, 'system/online', 'users', 'sys:online', 5, 0, now(), now());
+-- insert into sys_role_menu (role_id, menu_id) values (1, 6);
