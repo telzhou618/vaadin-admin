@@ -97,6 +97,7 @@ public class UserView extends VerticalLayout {
     private Component actionButtons(SysUser user) {
         Button edit = new Button("编辑", e -> openDialog(user, userService.getRoleIds(user.getId())));
         edit.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
+        edit.setEnabled(!SysUser.ADMIN_ID.equals(user.getId()));
 
         boolean enabled = Integer.valueOf(0).equals(user.getStatus());
         Button toggle = new Button(enabled ? "停用" : "启用", e -> {
@@ -105,9 +106,14 @@ public class UserView extends VerticalLayout {
             refresh();
         });
         toggle.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
+        toggle.setEnabled(!SysUser.ADMIN_ID.equals(user.getId()));
 
         Button delete = new Button("删除", e -> confirmDelete(user));
         delete.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
+        if (SysUser.ADMIN_ID.equals(user.getId())) {
+            delete.setEnabled(false);
+            delete.setTooltipText("admin 管理员不能被删除");
+        }
         return new HorizontalLayout(edit, toggle, delete);
     }
 
@@ -240,9 +246,13 @@ public class UserView extends VerticalLayout {
     private void confirmDelete(SysUser user) {
         ConfirmDialog dialog = new ConfirmDialog("删除用户",
                 "确定删除用户「" + user.getUsername() + "」吗？", "删除", e -> {
-            userService.deleteUser(user.getId());
-            refresh();
-            Notification.show("删除成功");
+            try {
+                userService.deleteUser(user.getId());
+                refresh();
+                Notification.show("删除成功");
+            } catch (Exception ex) {
+                Notification.show(ex.getMessage(), 3000, Notification.Position.MIDDLE);
+            }
         });
         dialog.setConfirmButtonTheme("error primary");
         dialog.setCancelable(true);

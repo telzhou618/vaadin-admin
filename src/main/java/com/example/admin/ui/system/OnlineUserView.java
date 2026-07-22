@@ -3,6 +3,7 @@ package com.example.admin.ui.system;
 import cn.hutool.core.date.DateUtil;
 import com.example.admin.security.RequiresPerm;
 import com.example.admin.system.dto.OnlineUser;
+import com.example.admin.system.entity.SysUser;
 import com.example.admin.system.service.OnlineUserService;
 import com.example.admin.ui.MainLayout;
 import com.vaadin.flow.component.Component;
@@ -69,15 +70,26 @@ public class OnlineUserView extends VerticalLayout {
     private Component actionButtons(OnlineUser user) {
         Button kick = new Button("强制下线", e -> confirmKick(user));
         kick.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
+        if (user.isCurrent()) {
+            kick.setEnabled(false);
+            kick.setTooltipText("不能强制下线自己");
+        } else if (SysUser.ADMIN_ID.equals(user.getUserId())) {
+            kick.setEnabled(false);
+            kick.setTooltipText("admin 管理员不能被强制下线");
+        }
         return kick;
     }
 
     private void confirmKick(OnlineUser user) {
         ConfirmDialog dialog = new ConfirmDialog("强制下线",
                 "确定将用户「" + user.getUsername() + "」的该会话踢下线吗？", "踢下线", e -> {
-            onlineUserService.kickout(user.getToken());
-            refresh();
-            Notification.show("已强制下线");
+            try {
+                onlineUserService.kickout(user.getToken());
+                refresh();
+                Notification.show("已强制下线");
+            } catch (Exception ex) {
+                Notification.show(ex.getMessage(), 3000, Notification.Position.MIDDLE);
+            }
         });
         dialog.setConfirmButtonTheme("error primary");
         dialog.setCancelable(true);

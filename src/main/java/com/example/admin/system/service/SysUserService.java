@@ -78,10 +78,13 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
                 .stream().map(SysUserRole::getRoleId).toList();
     }
 
-    /** 删除用户及其角色关联 */
+    /** 删除用户及其角色关联。内置 admin 管理员不可删除 */
     @OperLog("删除用户")
     @Transactional
     public void deleteUser(Long userId) {
+        if (SysUser.ADMIN_ID.equals(userId)) {
+            throw new RuntimeException("admin 管理员不能被删除");
+        }
         removeById(userId);
         userRoleMapper.delete(Wrappers.<SysUserRole>lambdaQuery().eq(SysUserRole::getUserId, userId));
     }

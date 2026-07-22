@@ -76,10 +76,20 @@ public class OnlineUserService {
     }
 
     /**
-     * 按 token 强制下线（被踢用户的该会话立即失效）
+     * 按 token 强制下线。内置 admin 管理员与当前会话不可踢出
      */
     @OperLog("强制下线")
     public void kickout(String token) {
+        Object loginId = StpUtil.getLoginIdByToken(token);
+        if (loginId == null) {
+            throw new RuntimeException("该会话已失效，请刷新列表");
+        }
+        if (SysUser.ADMIN_ID.equals(Long.valueOf(String.valueOf(loginId)))) {
+            throw new RuntimeException("admin 管理员不能被强制下线");
+        }
+        if (token.equals(StpUtil.getTokenValue())) {
+            throw new RuntimeException("不能强制下线自己");
+        }
         StpUtil.kickoutByTokenValue(token);
     }
 }

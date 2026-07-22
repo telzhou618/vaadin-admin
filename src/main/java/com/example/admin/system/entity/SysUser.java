@@ -11,6 +11,9 @@ import java.time.LocalDate;
 @TableName("sys_user")
 public class SysUser extends BaseEntity {
 
+    /** 内置管理员账号 id：不可删除、不可被强制下线 */
+    public static final Long ADMIN_ID = 1L;
+
     private String username;
 
     private String password;
