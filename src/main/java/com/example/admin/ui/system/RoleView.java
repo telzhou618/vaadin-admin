@@ -92,6 +92,7 @@ public class RoleView extends VerticalLayout {
 
     private void openDialog(SysRole role) {
         Dialog dialog = new Dialog();
+        dialog.setWidth("800px");
         dialog.setHeaderTitle(role.getId() == null ? "新增角色" : "编辑角色");
 
         TextField code = new TextField("角色编码");

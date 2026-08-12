@@ -102,6 +102,7 @@ public class MenuView extends VerticalLayout {
 
     private void openDialog(SysMenu menu) {
         Dialog dialog = new Dialog();
+        dialog.setWidth("800px");
         dialog.setHeaderTitle(menu.getId() == null ? "新增菜单" : "编辑菜单");
 
         // 上级菜单：仅目录和菜单可选，留空表示根节点

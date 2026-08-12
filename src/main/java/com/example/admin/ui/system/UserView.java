@@ -164,6 +164,7 @@ public class UserView extends VerticalLayout {
     private void openDialog(SysUser user, List<Long> roleIds) {
         boolean isNew = user.getId() == null;
         Dialog dialog = new Dialog();
+        dialog.setWidth("800px");
         dialog.setHeaderTitle(isNew ? "新增用户" : "编辑用户");
 
         TextField username = new TextField("用户名");
