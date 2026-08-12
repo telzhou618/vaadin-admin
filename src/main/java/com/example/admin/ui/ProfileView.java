@@ -5,7 +5,10 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.lang.Validator;
 import com.example.admin.security.AuthService;
 import com.example.admin.system.entity.SysUser;
+import com.example.admin.system.service.ImgBBService;
 import com.example.admin.system.service.SysUserService;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -36,11 +39,13 @@ public class ProfileView extends VerticalLayout {
 
     private final AuthService authService;
     private final SysUserService userService;
+    private final ImgBBService imgBBService;
     private final VerticalLayout content = new VerticalLayout();
 
-    public ProfileView(AuthService authService, SysUserService userService) {
+    public ProfileView(AuthService authService, SysUserService userService, ImgBBService imgBBService) {
         this.authService = authService;
         this.userService = userService;
+        this.imgBBService = imgBBService;
         setSizeFull();
         getStyle().set("overflow-x", "hidden");
 
@@ -211,7 +216,32 @@ public class ProfileView extends VerticalLayout {
         TextField nickname = new TextField("昵称");
         TextField email = new TextField("邮箱");
         TextField phone = new TextField("手机号");
-        TextField avatar = new TextField("头像地址");
+        TextField avatarUrl = new TextField("头像地址");
+        avatarUrl.setReadOnly(true);
+        avatarUrl.setWidthFull();
+        MemoryBuffer avatarBuffer = new MemoryBuffer();
+        Upload avatarUpload = new Upload(avatarBuffer);
+        avatarUpload.setMaxFiles(1);
+        avatarUpload.setAcceptedFileTypes("image/*");
+        avatarUpload.setDropAllowed(false);
+        avatarUpload.getStyle().set("flex-direction", "column");
+        avatarUpload.addSucceededListener(event -> {
+            try {
+                byte[] bytes = avatarBuffer.getInputStream().readAllBytes();
+                String url = imgBBService.upload(bytes, event.getFileName());
+                getUI().ifPresent(ui -> ui.access(() -> {
+                    if (url != null) {
+                        user.setAvatar(url);
+                        avatarUrl.setValue(url);
+                        Notify.success("头像上传成功");
+                    } else {
+                        Notify.error("头像上传失败，请重试");
+                    }
+                }));
+            } catch (Exception ex) {
+                getUI().ifPresent(ui -> ui.access(() -> Notify.error("头像上传失败：" + ex.getMessage())));
+            }
+        });
         RadioButtonGroup<Integer> gender = new RadioButtonGroup<>("性别");
         gender.setItems(0, 1, 2);
         gender.setItemLabelGenerator(this::genderText);
@@ -227,14 +257,15 @@ public class ProfileView extends VerticalLayout {
         binder.forField(phone)
                 .withValidator(p -> StrUtil.isBlank(p) || p.matches("\\d{11}"), "请输入 11 位手机号")
                 .bind(SysUser::getPhone, SysUser::setPhone);
-        binder.bind(avatar, SysUser::getAvatar, SysUser::setAvatar);
         binder.forField(gender).bind(SysUser::getGender, SysUser::setGender);
         binder.bind(birthday, SysUser::getBirthday, SysUser::setBirthday);
         email.setRequiredIndicatorVisible(true);
 
         binder.readBean(user);
+        // 回显已有头像 URL
+        avatarUrl.setValue(StrUtil.isBlank(user.getAvatar()) ? "" : user.getAvatar());
 
-        FormLayout form = new FormLayout(nickname, email, phone, gender, birthday, avatar);
+        FormLayout form = new FormLayout(nickname, email, phone, gender, birthday, avatarUrl, avatarUpload);
         form.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 2));
         dialog.add(form);
 

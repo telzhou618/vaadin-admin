@@ -7,8 +7,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.admin.security.RequiresPerm;
 import com.example.admin.system.entity.SysRole;
 import com.example.admin.system.entity.SysUser;
+import com.example.admin.system.service.ImgBBService;
 import com.example.admin.system.service.SysRoleService;
 import com.example.admin.system.service.SysUserService;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.example.admin.ui.MainLayout;
 import com.example.admin.ui.PaginationBar;
 import com.vaadin.flow.component.Component;
@@ -49,13 +52,15 @@ public class UserView extends VerticalLayout {
 
     private final SysUserService userService;
     private final SysRoleService roleService;
+    private final ImgBBService imgBBService;
     private final Grid<SysUser> grid = new Grid<>(SysUser.class, false);
     private final TextField keyword = new TextField();
     private final PaginationBar paginationBar = new PaginationBar(this::loadPage);
 
-    public UserView(SysUserService userService, SysRoleService roleService) {
+    public UserView(SysUserService userService, SysRoleService roleService, ImgBBService imgBBService) {
         this.userService = userService;
         this.roleService = roleService;
+        this.imgBBService = imgBBService;
         setSizeFull();
 
         H2 title = new H2("用户管理");
@@ -176,7 +181,32 @@ public class UserView extends VerticalLayout {
         TextField nickname = new TextField("昵称");
         TextField email = new TextField("邮箱");
         TextField phone = new TextField("手机号");
-        TextField avatar = new TextField("头像地址");
+        TextField avatarUrl = new TextField("头像地址");
+        avatarUrl.setReadOnly(true);
+        avatarUrl.setWidthFull();
+        MemoryBuffer avatarBuffer = new MemoryBuffer();
+        Upload avatarUpload = new Upload(avatarBuffer);
+        avatarUpload.setMaxFiles(1);
+        avatarUpload.setAcceptedFileTypes("image/*");
+        avatarUpload.setDropAllowed(false);
+        avatarUpload.getStyle().set("flex-direction", "column");
+        avatarUpload.addSucceededListener(event -> {
+            try {
+                byte[] bytes = avatarBuffer.getInputStream().readAllBytes();
+                String url = imgBBService.upload(bytes, event.getFileName());
+                getUI().ifPresent(ui -> ui.access(() -> {
+                    if (url != null) {
+                        user.setAvatar(url);
+                        avatarUrl.setValue(url);
+                        Notify.success("头像上传成功");
+                    } else {
+                        Notify.error("头像上传失败，请重试");
+                    }
+                }));
+            } catch (Exception ex) {
+                getUI().ifPresent(ui -> ui.access(() -> Notify.error("头像上传失败：" + ex.getMessage())));
+            }
+        });
         RadioButtonGroup<Integer> gender = new RadioButtonGroup<>("性别");
         gender.setItems(0, 1, 2);
         gender.setItemLabelGenerator(this::genderText);
@@ -206,7 +236,6 @@ public class UserView extends VerticalLayout {
                 .asRequired("手机号不能为空")
                 .withValidator(p -> StrUtil.isBlank(p) || p.matches("\\d{11}"), "请输入 11 位手机号")
                 .bind(SysUser::getPhone, SysUser::setPhone);
-        binder.bind(avatar, SysUser::getAvatar, SysUser::setAvatar);
         binder.forField(gender).bind(SysUser::getGender, SysUser::setGender);
         binder.bind(birthday, SysUser::getBirthday, SysUser::setBirthday);
         var passwordBinding = binder.forField(password);
@@ -224,10 +253,14 @@ public class UserView extends VerticalLayout {
         }
 
         binder.readBean(user);
+        // 编辑已有用户时回显头像 URL
+        if (!isNew) {
+            avatarUrl.setValue(StrUtil.isBlank(user.getAvatar()) ? "" : user.getAvatar());
+        }
         // 编辑时实体里是 BCrypt 密文，清空密码框；留空保存即不修改密码
         password.clear();
 
-        FormLayout form = new FormLayout(username, nickname, email, phone, gender, birthday, avatar, password, enabled, roles);
+        FormLayout form = new FormLayout(username, nickname, email, phone, gender, birthday, avatarUrl, avatarUpload, password, enabled, roles);
         form.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 2));
         dialog.add(form);
 

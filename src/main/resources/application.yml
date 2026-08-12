@@ -39,3 +39,8 @@ sa-token:
 vaadin:
   # 限定 Vaadin 类扫描范围，加快启动
   allowed-packages: com.example.admin
+
+# 免费图床服务 https://api.imgbb.com/
+imgbb:
+  api-url: https://api.imgbb.com/1/upload
+  api-key: ${IMGBB_API_KEY:}
