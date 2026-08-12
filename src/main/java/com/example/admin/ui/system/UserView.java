@@ -104,6 +104,7 @@ public class UserView extends VerticalLayout {
             user.setStatus(enabled ? 1 : 0);
             userService.updateById(user);
             refresh();
+            Notify.success(enabled ? "用户已停用" : "用户已启用");
         });
         toggle.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
         toggle.setEnabled(!SysUser.ADMIN_ID.equals(user.getId()));
@@ -117,7 +118,9 @@ public class UserView extends VerticalLayout {
         return new HorizontalLayout(edit, toggle, delete);
     }
 
-    /** 状态徽标：绿色正常 / 红色停用 */
+    /**
+     * 状态徽标：绿色正常 / 红色停用
+     */
     private Component statusBadge(Integer status) {
         boolean enabled = Integer.valueOf(0).equals(status);
         Span badge = new Span(enabled ? "正常" : "停用");
@@ -125,7 +128,9 @@ public class UserView extends VerticalLayout {
         return badge;
     }
 
-    /** 头像：有地址显示圆形图片，无地址显示默认图标 */
+    /**
+     * 头像：有地址显示圆形图片，无地址显示默认图标
+     */
     private Component avatar(String url) {
         if (StrUtil.isBlank(url)) {
             Icon icon = new Icon(VaadinIcon.USER);
