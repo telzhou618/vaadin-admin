@@ -59,7 +59,7 @@ public class MenuView extends VerticalLayout {
         tree.addColumn(SysMenu::getPerms).setHeader("权限标识");
         tree.addColumn(SysMenu::getSort).setHeader("排序");
         tree.addComponentColumn(m -> statusBadge(m.getStatus())).setHeader("状态");
-        tree.addComponentColumn(this::actionButtons).setHeader("操作");
+        tree.addComponentColumn(this::actionButtons).setWidth("150px").setHeader("操作");
         tree.setSizeFull();
         tree.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 

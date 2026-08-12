@@ -62,7 +62,7 @@ public class RoleView extends VerticalLayout {
         grid.addColumn(SysRole::getDescription).setHeader("描述");
         grid.addComponentColumn(r -> statusBadge(r.getStatus())).setHeader("状态");
         grid.addColumn(r -> DateUtil.format(r.getCreateTime(), "yyyy-MM-dd HH:mm:ss")).setHeader("创建时间");
-        grid.addComponentColumn(this::actionButtons).setHeader("操作");
+        grid.addComponentColumn(this::actionButtons).setWidth("150px").setHeader("操作");
         grid.setSizeFull();
         grid.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 

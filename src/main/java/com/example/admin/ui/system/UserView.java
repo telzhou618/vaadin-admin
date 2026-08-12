@@ -86,7 +86,7 @@ public class UserView extends VerticalLayout {
         grid.addColumn(SysUser::getEmail).setHeader("邮箱");
         grid.addComponentColumn(u -> statusBadge(u.getStatus())).setHeader("状态");
         grid.addColumn(u -> DateUtil.format(u.getCreateTime(), "yyyy-MM-dd HH:mm:ss")).setHeader("创建时间");
-        grid.addComponentColumn(this::actionButtons).setHeader("操作");
+        grid.addComponentColumn(this::actionButtons).setWidth("150px").setHeader("操作");
         grid.setSizeFull();
         grid.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 

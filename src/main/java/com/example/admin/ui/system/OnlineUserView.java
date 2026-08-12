@@ -52,7 +52,7 @@ public class OnlineUserView extends VerticalLayout {
         grid.addColumn(u -> u.getLoginTime() == null ? "" : DateUtil.format(u.getLoginTime(), "yyyy-MM-dd HH:mm:ss"))
                 .setHeader("登录时间");
         grid.addColumn(u -> formatRemain(u.getRemainSeconds())).setHeader("剩余有效期");
-        grid.addComponentColumn(this::actionButtons).setHeader("操作");
+        grid.addComponentColumn(this::actionButtons).setWidth("150px").setHeader("操作");
         grid.setSizeFull();
         grid.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 
