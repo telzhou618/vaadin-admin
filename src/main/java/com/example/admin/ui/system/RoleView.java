@@ -20,7 +20,7 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
+import com.example.admin.ui.Notify;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -140,9 +140,9 @@ public class RoleView extends VerticalLayout {
                         menuTree.getSelectedItems().stream().map(SysMenu::getId).toList());
                 dialog.close();
                 refresh();
-                Notification.show("保存成功");
+                Notify.success("保存成功");
             } catch (Exception ex) {
-                Notification.show(ex.getMessage(), 3000, Notification.Position.MIDDLE);
+                Notify.error(ex.getMessage());
             }
         });
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -168,7 +168,7 @@ public class RoleView extends VerticalLayout {
                 "确定删除角色「" + role.getName() + "」吗？", "删除", e -> {
             roleService.deleteRole(role.getId());
             refresh();
-            Notification.show("删除成功");
+            Notify.success("删除成功");
         });
         dialog.setConfirmButtonTheme("error primary");
         dialog.setCancelable(true);

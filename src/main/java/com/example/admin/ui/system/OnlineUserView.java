@@ -16,7 +16,7 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
+import com.example.admin.ui.Notify;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
@@ -86,9 +86,9 @@ public class OnlineUserView extends VerticalLayout {
             try {
                 onlineUserService.kickout(user.getToken());
                 refresh();
-                Notification.show("已强制下线");
+                Notify.success("已强制下线");
             } catch (Exception ex) {
-                Notification.show(ex.getMessage(), 3000, Notification.Position.MIDDLE);
+                Notify.error(ex.getMessage());
             }
         });
         dialog.setConfirmButtonTheme("error primary");
