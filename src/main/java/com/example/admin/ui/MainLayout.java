@@ -24,7 +24,9 @@ import com.vaadin.flow.component.sidenav.SideNavItem;
 
 import java.time.Year;
 
-/** 主布局：顶部栏 + 按当前用户菜单动态生成的侧边导航 */
+/**
+ * 主布局：顶部栏 + 按当前用户菜单动态生成的侧边导航
+ */
 @StyleSheet("context://styles/vaadin-admin.css")
 public class MainLayout extends AppLayout {
 
@@ -82,7 +84,9 @@ public class MainLayout extends AppLayout {
                 .set("font-size", "var(--lumo-font-size-xs)");
     }
 
-    /** 路由内容外包一层：视图占满剩余空间，版权信息固定在主页面底部居中 */
+    /**
+     * 路由内容外包一层：视图占满剩余空间，版权信息固定在主页面底部居中
+     */
     @Override
     public void showRouterLayoutContent(HasElement content) {
         Div viewContainer = new Div();
@@ -97,7 +101,9 @@ public class MainLayout extends AppLayout {
         setContent(wrapper);
     }
 
-    /** 菜单实体转导航项（目录渲染为可展开分组） */
+    /**
+     * 菜单实体转导航项（目录渲染为可展开分组）
+     */
     private SideNavItem toNavItem(SysMenu menu) {
         SideNavItem item = menu.getType() != null && menu.getType() == 1
                 ? new SideNavItem(menu.getName(), menu.getPath())
