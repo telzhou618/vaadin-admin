@@ -23,7 +23,7 @@ public class ChangePasswordDialog extends Dialog {
 
     public ChangePasswordDialog(SysUserService userService) {
         setHeaderTitle("修改密码");
-        setWidth("400px");
+        setWidth("600px");
 
         PasswordField oldPassword = new PasswordField("原密码");
         PasswordField newPassword = new PasswordField("新密码");

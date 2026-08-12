@@ -204,6 +204,7 @@ public class ProfileView extends VerticalLayout {
     private void openEditDialog() {
         SysUser user = authService.getCurrentUser();
         Dialog dialog = new Dialog();
+        dialog.setWidth("800px");
         dialog.setHeaderTitle("编辑资料");
 
         TextField nickname = new TextField("昵称");
