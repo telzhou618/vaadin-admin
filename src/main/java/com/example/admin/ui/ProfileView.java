@@ -42,6 +42,7 @@ public class ProfileView extends VerticalLayout {
         this.authService = authService;
         this.userService = userService;
         setSizeFull();
+        getStyle().set("overflow-x", "hidden");
 
         H2 title = new H2("个人中心");
         title.addClassName("page-title");
