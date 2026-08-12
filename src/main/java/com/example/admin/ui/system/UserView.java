@@ -203,6 +203,7 @@ public class UserView extends VerticalLayout {
                 .withValidator(e -> StrUtil.isBlank(e) || Validator.isEmail(e), "邮箱格式不正确")
                 .bind(SysUser::getEmail, SysUser::setEmail);
         binder.forField(phone)
+                .asRequired("手机号不能为空")
                 .withValidator(p -> StrUtil.isBlank(p) || p.matches("\\d{11}"), "请输入 11 位手机号")
                 .bind(SysUser::getPhone, SysUser::setPhone);
         binder.bind(avatar, SysUser::getAvatar, SysUser::setAvatar);
