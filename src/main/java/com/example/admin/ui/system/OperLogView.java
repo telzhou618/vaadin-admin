@@ -53,13 +53,13 @@ public class OperLogView extends VerticalLayout {
         toolbar.expand(title);
         toolbar.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
-        grid.addColumn(SysOperLog::getId).setHeader("ID").setWidth("80px").setFlexGrow(0);
+        grid.addColumn(SysOperLog::getId).setHeader("ID");
         grid.addColumn(SysOperLog::getUsername).setHeader("操作人");
         grid.addColumn(SysOperLog::getOperation).setHeader("操作");
-        grid.addComponentColumn(l -> statusBadge(l.getStatus())).setHeader("状态").setWidth("90px").setFlexGrow(0);
+        grid.addComponentColumn(l -> statusBadge(l.getStatus())).setHeader("状态");
         grid.addColumn(SysOperLog::getIp).setHeader("IP");
         grid.addColumn(l -> l.getCostMs() == null ? "" : l.getCostMs() + " ms").setHeader("耗时")
-                .setWidth("90px").setFlexGrow(0);
+                ;
         grid.addColumn(SysOperLog::getErrorMsg).setHeader("错误信息");
         grid.addColumn(l -> DateUtil.format(l.getCreateTime(), "yyyy-MM-dd HH:mm:ss")).setHeader("操作时间");
         grid.setSizeFull();

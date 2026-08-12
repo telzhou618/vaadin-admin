@@ -47,12 +47,12 @@ public class OnlineUserView extends VerticalLayout {
 
         grid.addColumn(OnlineUser::getUsername).setHeader("用户名");
         grid.addColumn(OnlineUser::getNickname).setHeader("昵称");
-        grid.addComponentColumn(this::sessionBadge).setHeader("会话").setWidth("100px").setFlexGrow(0);
+        grid.addComponentColumn(this::sessionBadge).setHeader("会话");
         grid.addColumn(OnlineUser::getIp).setHeader("登录 IP");
         grid.addColumn(u -> u.getLoginTime() == null ? "" : DateUtil.format(u.getLoginTime(), "yyyy-MM-dd HH:mm:ss"))
                 .setHeader("登录时间");
         grid.addColumn(u -> formatRemain(u.getRemainSeconds())).setHeader("剩余有效期");
-        grid.addComponentColumn(this::actionButtons).setHeader("操作").setWidth("120px").setFlexGrow(0);
+        grid.addComponentColumn(this::actionButtons).setHeader("操作");
         grid.setSizeFull();
         grid.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 

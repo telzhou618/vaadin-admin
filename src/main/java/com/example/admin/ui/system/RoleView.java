@@ -56,13 +56,13 @@ public class RoleView extends VerticalLayout {
         toolbar.expand(title);
         toolbar.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
-        grid.addColumn(SysRole::getId).setHeader("ID").setWidth("80px").setFlexGrow(0);
+        grid.addColumn(SysRole::getId).setHeader("ID");
         grid.addColumn(SysRole::getCode).setHeader("角色编码");
         grid.addColumn(SysRole::getName).setHeader("角色名称");
         grid.addColumn(SysRole::getDescription).setHeader("描述");
-        grid.addComponentColumn(r -> statusBadge(r.getStatus())).setHeader("状态").setWidth("90px").setFlexGrow(0);
+        grid.addComponentColumn(r -> statusBadge(r.getStatus())).setHeader("状态");
         grid.addColumn(r -> DateUtil.format(r.getCreateTime(), "yyyy-MM-dd HH:mm:ss")).setHeader("创建时间");
-        grid.addComponentColumn(this::actionButtons).setHeader("操作").setWidth("180px").setFlexGrow(0);
+        grid.addComponentColumn(this::actionButtons).setHeader("操作");
         grid.setSizeFull();
         grid.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 

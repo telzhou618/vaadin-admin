@@ -57,8 +57,7 @@ public class HomeView extends VerticalLayout {
         Grid<SysOperLog> recentGrid = new Grid<>(SysOperLog.class, false);
         recentGrid.addColumn(SysOperLog::getUsername).setHeader("操作人");
         recentGrid.addColumn(SysOperLog::getOperation).setHeader("操作");
-        recentGrid.addComponentColumn(l -> statusBadge(l.getStatus())).setHeader("状态")
-                .setWidth("90px").setFlexGrow(0);
+        recentGrid.addComponentColumn(l -> statusBadge(l.getStatus())).setHeader("状态");
         recentGrid.addColumn(l -> DateUtil.format(l.getCreateTime(), "yyyy-MM-dd HH:mm:ss")).setHeader("操作时间");
         recentGrid.setItems(operLogService.listLatest(10));
         recentGrid.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);

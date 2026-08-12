@@ -54,12 +54,12 @@ public class MenuView extends VerticalLayout {
         toolbar.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
         tree.addHierarchyColumn(SysMenu::getName).setHeader("菜单名称");
-        tree.addColumn(m -> typeName(m.getType())).setHeader("类型").setWidth("80px").setFlexGrow(0);
+        tree.addColumn(m -> typeName(m.getType())).setHeader("类型");
         tree.addColumn(SysMenu::getPath).setHeader("路由地址");
         tree.addColumn(SysMenu::getPerms).setHeader("权限标识");
-        tree.addColumn(SysMenu::getSort).setHeader("排序").setWidth("80px").setFlexGrow(0);
-        tree.addComponentColumn(m -> statusBadge(m.getStatus())).setHeader("状态").setWidth("90px").setFlexGrow(0);
-        tree.addComponentColumn(this::actionButtons).setHeader("操作").setWidth("180px").setFlexGrow(0);
+        tree.addColumn(SysMenu::getSort).setHeader("排序");
+        tree.addComponentColumn(m -> statusBadge(m.getStatus())).setHeader("状态");
+        tree.addComponentColumn(this::actionButtons).setHeader("操作");
         tree.setSizeFull();
         tree.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 

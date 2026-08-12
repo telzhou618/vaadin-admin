@@ -75,18 +75,18 @@ public class UserView extends VerticalLayout {
         toolbar.expand(title);
         toolbar.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
-        grid.addColumn(SysUser::getId).setHeader("ID").setWidth("80px").setFlexGrow(0);
-        grid.addComponentColumn(u -> avatar(u.getAvatar())).setHeader("头像").setWidth("70px").setFlexGrow(0);
+        grid.addColumn(SysUser::getId).setHeader("ID");
+        grid.addComponentColumn(u -> avatar(u.getAvatar())).setHeader("头像");
         grid.addColumn(SysUser::getUsername).setHeader("用户名");
         grid.addColumn(SysUser::getNickname).setHeader("昵称");
         grid.addColumn(SysUser::getPhone).setHeader("手机号");
-        grid.addColumn(u -> genderText(u.getGender())).setHeader("性别").setWidth("70px").setFlexGrow(0);
+        grid.addColumn(u -> genderText(u.getGender())).setHeader("性别");
         grid.addColumn(u -> u.getBirthday() == null ? "" : u.getBirthday().toString())
                 .setHeader("生日");
         grid.addColumn(SysUser::getEmail).setHeader("邮箱");
-        grid.addComponentColumn(u -> statusBadge(u.getStatus())).setHeader("状态").setWidth("90px").setFlexGrow(0);
+        grid.addComponentColumn(u -> statusBadge(u.getStatus())).setHeader("状态");
         grid.addColumn(u -> DateUtil.format(u.getCreateTime(), "yyyy-MM-dd HH:mm:ss")).setHeader("创建时间");
-        grid.addComponentColumn(this::actionButtons).setHeader("操作").setWidth("230px").setFlexGrow(0);
+        grid.addComponentColumn(this::actionButtons).setHeader("操作");
         grid.setSizeFull();
         grid.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 
