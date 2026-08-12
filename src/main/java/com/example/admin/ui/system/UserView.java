@@ -14,6 +14,7 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.example.admin.ui.MainLayout;
 import com.example.admin.ui.PaginationBar;
+import com.example.admin.i18n.UiI18n;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -186,6 +187,7 @@ public class UserView extends VerticalLayout {
         avatarUrl.setWidthFull();
         MemoryBuffer avatarBuffer = new MemoryBuffer();
         Upload avatarUpload = new Upload(avatarBuffer);
+        UiI18n.applyChinese(avatarUpload);
         avatarUpload.setMaxFiles(1);
         avatarUpload.setAcceptedFileTypes("image/*");
         avatarUpload.setDropAllowed(false);
@@ -210,7 +212,7 @@ public class UserView extends VerticalLayout {
         RadioButtonGroup<Integer> gender = new RadioButtonGroup<>("性别");
         gender.setItems(0, 1, 2);
         gender.setItemLabelGenerator(this::genderText);
-        DatePicker birthday = new DatePicker("生日");
+        DatePicker birthday = UiI18n.datePicker("生日");
         PasswordField password = new PasswordField(isNew ? "初始密码" : "重置密码（留空则不修改）");
         Checkbox enabled = new Checkbox("启用");
 
@@ -260,7 +262,7 @@ public class UserView extends VerticalLayout {
         // 编辑时实体里是 BCrypt 密文，清空密码框；留空保存即不修改密码
         password.clear();
 
-        FormLayout form = new FormLayout(username, nickname, email, phone, gender, birthday, avatarUrl, avatarUpload, password, enabled, roles);
+        FormLayout form = new FormLayout(username, nickname, email, phone, gender, birthday, avatarUrl, password, avatarUpload, enabled, roles);
         form.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 2));
         dialog.add(form);
 

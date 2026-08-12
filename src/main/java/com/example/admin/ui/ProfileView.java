@@ -1,14 +1,13 @@
 package com.example.admin.ui;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.StrUtil;
+import com.example.admin.i18n.UiI18n;
 import com.example.admin.security.AuthService;
 import com.example.admin.system.entity.SysUser;
 import com.example.admin.system.service.ImgBBService;
 import com.example.admin.system.service.SysUserService;
-import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -21,11 +20,12 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.example.admin.ui.Notify;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -221,6 +221,7 @@ public class ProfileView extends VerticalLayout {
         avatarUrl.setWidthFull();
         MemoryBuffer avatarBuffer = new MemoryBuffer();
         Upload avatarUpload = new Upload(avatarBuffer);
+        UiI18n.applyChinese(avatarUpload);
         avatarUpload.setMaxFiles(1);
         avatarUpload.setAcceptedFileTypes("image/*");
         avatarUpload.setDropAllowed(false);
@@ -245,7 +246,7 @@ public class ProfileView extends VerticalLayout {
         RadioButtonGroup<Integer> gender = new RadioButtonGroup<>("性别");
         gender.setItems(0, 1, 2);
         gender.setItemLabelGenerator(this::genderText);
-        DatePicker birthday = new DatePicker("生日");
+        DatePicker birthday = UiI18n.datePicker("生日");
 
         // Binder 绑定与校验：校验失败时错误信息红色显示在字段下方
         Binder<SysUser> binder = new Binder<>(SysUser.class);
@@ -265,7 +266,7 @@ public class ProfileView extends VerticalLayout {
         // 回显已有头像 URL
         avatarUrl.setValue(StrUtil.isBlank(user.getAvatar()) ? "" : user.getAvatar());
 
-        FormLayout form = new FormLayout(nickname, email, phone, gender, birthday, avatarUrl, avatarUpload);
+        FormLayout form = new FormLayout(nickname, email, phone, gender, avatarUrl, birthday, avatarUpload);
         form.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 2));
         dialog.add(form);
 
