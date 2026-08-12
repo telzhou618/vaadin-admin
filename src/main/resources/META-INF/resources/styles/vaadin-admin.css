@@ -1,0 +1,352 @@
+/* ===== vaadin-admin 全局简约主题 ===== */
+
+/* ---------- Lumo 变量覆盖 ---------- */
+html {
+  /* 主色调：柔和的靛蓝色 */
+  --lumo-primary-color: hsl(229, 86%, 62%);
+  --lumo-primary-color-50pct: hsla(229, 86%, 62%, 0.5);
+  --lumo-primary-color-10pct: hsla(229, 86%, 62%, 0.1);
+  --lumo-primary-text-color: hsl(229, 86%, 62%);
+
+  /* 成功色：柔和的绿色 */
+  --lumo-success-color: hsl(150, 55%, 45%);
+  --lumo-success-color-50pct: hsla(150, 55%, 45%, 0.5);
+  --lumo-success-color-10pct: hsla(150, 55%, 45%, 0.1);
+  --lumo-success-text-color: hsl(150, 55%, 45%);
+
+  /* 错误色：柔和的红色 */
+  --lumo-error-color: hsl(355, 70%, 52%);
+  --lumo-error-color-50pct: hsla(355, 70%, 52%, 0.5);
+  --lumo-error-color-10pct: hsla(355, 70%, 52%, 0.1);
+  --lumo-error-text-color: hsl(355, 70%, 52%);
+
+  /* 圆角：统一稍大 */
+  --lumo-border-radius-s: 4px;
+  --lumo-border-radius-m: 6px;
+  --lumo-border-radius-l: 10px;
+
+  /* 阴影：更柔和 */
+  --lumo-box-shadow-xs: 0 1px 2px hsla(0, 0%, 0%, 0.04);
+  --lumo-box-shadow-s: 0 2px 8px hsla(0, 0%, 0%, 0.06);
+  --lumo-box-shadow-m: 0 4px 16px hsla(0, 0%, 0%, 0.08);
+  --lumo-box-shadow-l: 0 8px 32px hsla(0, 0%, 0%, 0.1);
+
+  /* 正文字体 */
+  --lumo-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  /* 间距微调 */
+  --lumo-space-xs: 4px;
+  --lumo-space-s: 8px;
+  --lumo-space-m: 16px;
+  --lumo-space-l: 24px;
+  --lumo-space-xl: 40px;
+}
+
+/* ---------- 页面背景 ---------- */
+body {
+  background-color: #f6f7fa;
+}
+
+/* ---------- 侧边抽屉 ---------- */
+vaadin-app-layout::part(drawer) {
+  background-color: #fafbfd;
+  border-right: 1px solid hsl(0, 0%, 92%);
+}
+
+vaadin-side-nav {
+  padding: var(--lumo-space-s) 0;
+}
+
+vaadin-side-nav-item::part(item) {
+  border-radius: var(--lumo-border-radius-m);
+  margin: 2px var(--lumo-space-s);
+  transition: background-color 0.15s ease;
+}
+
+vaadin-side-nav-item::part(item):hover {
+  background-color: hsl(0, 0%, 95%);
+}
+
+vaadin-side-nav-item[active]::part(item) {
+  background-color: var(--lumo-primary-color-10pct);
+  color: var(--lumo-primary-color);
+  font-weight: 600;
+}
+
+vaadin-side-nav-item[active]::part(item)::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  background-color: var(--lumo-primary-color);
+  border-radius: 0 2px 2px 0;
+}
+
+/* ---------- 顶部导航栏 ---------- */
+vaadin-app-layout::part(navbar) {
+  background-color: hsl(0, 0%, 100%);
+  border-bottom: 1px solid hsl(0, 0%, 92%);
+  box-shadow: 0 1px 3px hsla(0, 0%, 0%, 0.04);
+}
+
+/* ---------- Grid 表格 ---------- */
+vaadin-grid {
+  border-radius: var(--lumo-border-radius-l);
+  overflow: hidden;
+  border: 1px solid hsl(0, 0%, 90%);
+  background-color: #fff;
+}
+
+vaadin-grid::part(header-cell) {
+  background-color: #fafbfd;
+  color: hsl(0, 0%, 40%);
+  font-weight: 600;
+  font-size: var(--lumo-font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: var(--lumo-space-s) var(--lumo-space-m);
+  border-bottom: 2px solid hsl(0, 0%, 90%);
+}
+
+vaadin-grid::part(body-cell) {
+  padding: var(--lumo-space-s) var(--lumo-space-m);
+}
+
+vaadin-grid::part(row):hover {
+  background-color: #f8f9fd;
+}
+
+/* ---------- TreeGrid ---------- */
+vaadin-grid[class~="tree-grid"] {
+  border-radius: var(--lumo-border-radius-l);
+  border: 1px solid hsl(0, 0%, 90%);
+}
+
+/* ---------- Button 微调 ---------- */
+vaadin-button {
+  border-radius: var(--lumo-border-radius-m);
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+/* ---------- Dialog ---------- */
+vaadin-dialog-overlay::part(overlay) {
+  border-radius: var(--lumo-border-radius-l);
+  box-shadow: var(--lumo-box-shadow-l);
+}
+
+vaadin-dialog-overlay::part(header) {
+  padding: var(--lumo-space-l) var(--lumo-space-l) 0;
+}
+
+vaadin-dialog-overlay::part(footer) {
+  padding: var(--lumo-space-m) var(--lumo-space-l) var(--lumo-space-l);
+}
+
+/* ---------- ConfirmDialog ---------- */
+vaadin-confirm-dialog-overlay::part(overlay) {
+  border-radius: var(--lumo-border-radius-l);
+}
+
+/* ---------- TextField / PasswordField / Select ---------- */
+vaadin-text-field::part(input-field),
+vaadin-password-field::part(input-field),
+vaadin-select::part(input-field),
+vaadin-combo-box::part(input-field),
+vaadin-date-picker::part(input-field),
+vaadin-multi-select-combo-box::part(input-field) {
+  border-radius: var(--lumo-border-radius-m);
+  background-color: #fff;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+vaadin-text-field[focused]::part(input-field),
+vaadin-password-field[focused]::part(input-field),
+vaadin-select[focused]::part(input-field),
+vaadin-combo-box[focused]::part(input-field),
+vaadin-date-picker[focused]::part(input-field),
+vaadin-multi-select-combo-box[focused]::part(input-field) {
+  box-shadow: 0 0 0 3px var(--lumo-primary-color-10pct);
+}
+
+/* ---------- Badge 徽标 ---------- */
+[theme~="badge"] {
+  border-radius: var(--lumo-border-radius-s);
+  padding: 2px 10px;
+  font-size: var(--lumo-font-size-xs);
+  font-weight: 500;
+}
+
+[theme~="badge"][theme~="success"] {
+  background-color: var(--lumo-success-color-10pct);
+  color: var(--lumo-success-text-color);
+}
+
+[theme~="badge"][theme~="error"] {
+  background-color: var(--lumo-error-color-10pct);
+  color: var(--lumo-error-text-color);
+}
+
+/* ---------- Notification ---------- */
+vaadin-notification-card {
+  border-radius: var(--lumo-border-radius-m) !important;
+  font-weight: 500;
+}
+
+/* ---------- 统计卡片 ---------- */
+.stat-card {
+  background: #fff;
+  border: 1px solid hsl(0, 0%, 90%);
+  border-radius: var(--lumo-border-radius-l);
+  box-shadow: var(--lumo-box-shadow-s);
+  padding: var(--lumo-space-m);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.stat-card:hover {
+  box-shadow: var(--lumo-box-shadow-m);
+  transform: translateY(-2px);
+}
+
+.stat-icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--lumo-border-radius-m);
+  flex-shrink: 0;
+}
+
+.stat-number {
+  font-size: var(--lumo-font-size-xxl);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.stat-label {
+  color: var(--lumo-secondary-text-color);
+  font-size: var(--lumo-font-size-s);
+}
+
+/* ---------- 渐变横幅 ---------- */
+.hero-banner {
+  background: linear-gradient(135deg, hsl(225, 70%, 96%) 0%, hsl(230, 60%, 93%) 100%);
+  border-radius: var(--lumo-border-radius-l);
+  padding: var(--lumo-space-l);
+  width: 100%;
+}
+
+/* ---------- 资料卡片 ---------- */
+.info-card {
+  background: #fff;
+  border: 1px solid hsl(0, 0%, 90%);
+  border-radius: var(--lumo-border-radius-l);
+  box-shadow: var(--lumo-box-shadow-s);
+  padding: var(--lumo-space-m);
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: var(--lumo-space-m);
+  padding: var(--lumo-space-s) 0;
+}
+
+.field-row:not(:last-child) {
+  border-bottom: 1px solid hsl(0, 0%, 92%);
+}
+
+.field-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--lumo-primary-color);
+}
+
+.field-label {
+  color: var(--lumo-secondary-text-color);
+  width: 5.5em;
+  flex-shrink: 0;
+  font-size: var(--lumo-font-size-s);
+}
+
+.field-value {
+  font-weight: 500;
+  flex: 1;
+}
+
+/* ---------- 登录页 ---------- */
+.login-bg {
+  background: linear-gradient(135deg, hsl(225, 70%, 96%) 0%, hsl(230, 60%, 91%) 100%);
+}
+
+.login-card {
+  background: #fff;
+  border-radius: var(--lumo-border-radius-l);
+  box-shadow: var(--lumo-box-shadow-l);
+  padding: var(--lumo-space-l);
+}
+
+.login-card vaadin-button[theme~="primary"] {
+  border-radius: var(--lumo-border-radius-m);
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+/* ---------- 个人中心 ---------- */
+.avatar-circle {
+  border: 4px solid #fff;
+  border-radius: 50%;
+  box-shadow: var(--lumo-box-shadow-s);
+  box-sizing: border-box;
+  background: hsl(0, 0%, 95%);
+}
+
+.hero-container {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---------- 页面标题 ---------- */
+.page-title {
+  margin: 0;
+  font-size: var(--lumo-font-size-xl);
+  font-weight: 600;
+}
+
+/* ---------- 过渡动画 ---------- */
+.vaadin-admin-fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- 滚动条美化 ---------- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(0, 0%, 84%);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(0, 0%, 70%);
+}

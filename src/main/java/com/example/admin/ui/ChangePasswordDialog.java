@@ -6,7 +6,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.notification.Notification;
+import com.example.admin.ui.Notify;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.data.binder.Binder;
 import lombok.Data;
@@ -61,7 +61,7 @@ public class ChangePasswordDialog extends Dialog {
                 userService.changePassword(StpUtil.getLoginIdAsLong(),
                         form.getOldPassword(), form.getNewPassword());
                 close();
-                Notification.show("密码修改成功，请重新登录", 3000, Notification.Position.TOP_CENTER);
+                Notify.success("密码修改成功，请重新登录");
                 StpUtil.logout();
                 getUI().ifPresent(ui -> ui.navigate(LoginView.class));
             } catch (Exception ex) {

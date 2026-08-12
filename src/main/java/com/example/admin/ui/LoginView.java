@@ -9,7 +9,7 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
+import com.example.admin.ui.Notify;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -36,7 +36,7 @@ public class LoginView extends VerticalLayout {
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
-        getStyle().set("background", "linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)");
+        addClassName("login-bg");
 
         Icon logo = new Icon(VaadinIcon.SHIELD);
         logo.getStyle()
@@ -64,8 +64,7 @@ public class LoginView extends VerticalLayout {
         captchaImage.setHeight("40px");
         captchaImage.getStyle()
                 .set("cursor", "pointer")
-                .set("border-radius", "var(--lumo-border-radius-m)")
-                .set("border", "1px solid var(--lumo-contrast-20pct)");
+                .set("border-radius", "var(--lumo-border-radius-m)");
         captchaImage.addClickListener(e -> refreshCaptcha(captchaImage));
         HorizontalLayout captchaRow = new HorizontalLayout(captcha, captchaImage);
         captchaRow.setWidthFull();
@@ -99,11 +98,7 @@ public class LoginView extends VerticalLayout {
         card.setWidth("380px");
         card.setAlignItems(Alignment.CENTER);
         card.setPadding(true);
-        card.getStyle()
-                .set("background", "var(--lumo-base-color)")
-                .set("border-radius", "var(--lumo-border-radius-l)")
-                .set("box-shadow", "var(--lumo-box-shadow-l)")
-                .set("padding", "var(--lumo-space-l)");
+        card.addClassName("login-card");
         Span copyright = new Span("Copyright © " + Year.now().getValue() + " vaadin-admin 版权所有");
         copyright.getStyle()
                 .set("color", "var(--lumo-secondary-text-color)")
@@ -120,7 +115,7 @@ public class LoginView extends VerticalLayout {
                 authService.login(form.getUsername(), form.getPassword(), form.getCaptcha());
                 login.getUI().ifPresent(ui -> ui.navigate(HomeView.class));
             } catch (Exception ex) {
-                Notification.show(ex.getMessage(), 3000, Notification.Position.TOP_CENTER);
+                Notify.error(ex.getMessage());
                 // 验证码一次性有效，登录失败后刷新；同时清空密码和验证码输入
                 refreshCaptcha(captchaImage);
                 password.clear();

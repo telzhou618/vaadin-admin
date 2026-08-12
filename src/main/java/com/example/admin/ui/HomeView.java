@@ -37,15 +37,10 @@ public class HomeView extends VerticalLayout {
 
         // 欢迎横幅
         H2 greeting = new H2("你好，" + name);
-        greeting.getStyle().set("margin", "0");
         Paragraph dateInfo = new Paragraph("今天是 " + DateUtil.format(new Date(), "yyyy年MM月dd日 EEEE")
                 + "，欢迎使用 vaadin-admin 管理后台。");
-        dateInfo.getStyle().set("color", "var(--lumo-secondary-text-color)").set("margin", "0");
         VerticalLayout banner = new VerticalLayout(greeting, dateInfo);
-        banner.getStyle()
-                .set("background", "linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)")
-                .set("border-radius", "var(--lumo-border-radius-l)")
-                .set("padding", "var(--lumo-space-l)");
+        banner.addClassName("hero-banner");
         banner.setWidthFull();
 
         // 统计卡片
@@ -59,7 +54,6 @@ public class HomeView extends VerticalLayout {
 
         // 最近操作
         H3 recentTitle = new H3("最近操作");
-        recentTitle.getStyle().set("margin", "0").set("font-size", "var(--lumo-font-size-l)");
         Grid<SysOperLog> recentGrid = new Grid<>(SysOperLog.class, false);
         recentGrid.addColumn(SysOperLog::getUsername).setHeader("操作人");
         recentGrid.addColumn(SysOperLog::getOperation).setHeader("操作");
@@ -71,12 +65,7 @@ public class HomeView extends VerticalLayout {
         recentGrid.setAllRowsVisible(true);
         VerticalLayout recentCard = new VerticalLayout(recentTitle, recentGrid);
         recentCard.setWidthFull();
-        recentCard.getStyle()
-                .set("background", "var(--lumo-base-color)")
-                .set("border", "1px solid var(--lumo-contrast-10pct)")
-                .set("border-radius", "var(--lumo-border-radius-l)")
-                .set("box-shadow", "var(--lumo-box-shadow-s)")
-                .set("padding", "var(--lumo-space-m)");
+        recentCard.addClassName("info-card");
 
         add(banner, stats, recentCard);
     }
@@ -86,34 +75,20 @@ public class HomeView extends VerticalLayout {
         Icon icon = new Icon(vaadinIcon);
         icon.getStyle().set("color", "#fff").set("width", "22px").set("height", "22px");
         Span iconBox = new Span(icon);
-        iconBox.getStyle()
-                .set("background", color)
-                .set("border-radius", "var(--lumo-border-radius-m)")
-                .set("display", "inline-flex")
-                .set("align-items", "center")
-                .set("justify-content", "center")
-                .set("width", "44px")
-                .set("height", "44px")
-                .set("flex-shrink", "0");
+        iconBox.getStyle().set("background", color);
+        iconBox.addClassName("stat-icon-box");
 
         Span number = new Span(String.valueOf(value));
-        number.getStyle().set("font-size", "var(--lumo-font-size-xxl)").set("font-weight", "600");
+        number.addClassName("stat-number");
         Span labelEl = new Span(label);
-        labelEl.getStyle()
-                .set("color", "var(--lumo-secondary-text-color)")
-                .set("font-size", "var(--lumo-font-size-s)");
+        labelEl.addClassName("stat-label");
         VerticalLayout text = new VerticalLayout(number, labelEl);
         text.setPadding(false);
         text.setSpacing(false);
 
         HorizontalLayout card = new HorizontalLayout(iconBox, text);
         card.setAlignItems(Alignment.CENTER);
-        card.getStyle()
-                .set("background", "var(--lumo-base-color)")
-                .set("border", "1px solid var(--lumo-contrast-10pct)")
-                .set("border-radius", "var(--lumo-border-radius-l)")
-                .set("box-shadow", "var(--lumo-box-shadow-s)")
-                .set("padding", "var(--lumo-space-m)");
+        card.addClassName("stat-card");
         return card;
     }
 

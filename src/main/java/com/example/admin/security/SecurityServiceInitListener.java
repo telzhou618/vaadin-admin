@@ -3,7 +3,7 @@ package com.example.admin.security;
 import cn.dev33.satoken.stp.StpUtil;
 import com.example.admin.ui.HomeView;
 import com.example.admin.ui.LoginView;
-import com.vaadin.flow.component.notification.Notification;
+import com.example.admin.ui.Notify;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
@@ -42,7 +42,7 @@ public class SecurityServiceInitListener implements VaadinServiceInitListener {
         // 页面级权限校验
         RequiresPerm requiresPerm = target.getAnnotation(RequiresPerm.class);
         if (requiresPerm != null && !StpUtil.hasPermission(requiresPerm.value())) {
-            Notification.show("没有访问权限", 3000, Notification.Position.MIDDLE);
+            Notify.error("没有访问权限");
             event.forwardTo(HomeView.class);
         }
     }
