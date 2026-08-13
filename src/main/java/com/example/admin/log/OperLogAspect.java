@@ -16,7 +16,9 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
-/** 操作日志切面：拦截 @OperLog 方法，记录操作人、执行结果与耗时 */
+/**
+ * 操作日志切面：拦截 @OperLog 方法，记录操作人、执行结果与耗时
+ */
 @Slf4j
 @Aspect
 @Component
@@ -34,7 +36,9 @@ public class OperLogAspect {
         record.setOperation(operLog.value());
         record.setIp(clientIp());
         try {
-            record.setParams(JSONUtil.toJsonStr(pjp.getArgs()));
+            if (!operLog.ignoreParams()) {
+                record.setParams(JSONUtil.toJsonStr(pjp.getArgs()));
+            }
             Object result = pjp.proceed();
             record.setStatus(0);
             return result;
@@ -48,7 +52,9 @@ public class OperLogAspect {
         }
     }
 
-    /** 操作人：已登录取当前用户名；未登录场景（如登录接口本身）取第一个字符串参数 */
+    /**
+     * 操作人：已登录取当前用户名；未登录场景（如登录接口本身）取第一个字符串参数
+     */
     private String currentUsername(ProceedingJoinPoint pjp) {
         try {
             SysUser user = userService.getById(StpUtil.getLoginIdAsLong());
@@ -76,7 +82,9 @@ public class OperLogAspect {
         return msg.length() > 500 ? msg.substring(0, 500) : msg;
     }
 
-    /** 日志写库失败不影响业务 */
+    /**
+     * 日志写库失败不影响业务
+     */
     private void saveQuietly(SysOperLog record) {
         try {
             operLogService.save(record);

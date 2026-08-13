@@ -107,8 +107,7 @@ public class UserView extends VerticalLayout {
 
         boolean enabled = Integer.valueOf(0).equals(user.getStatus());
         Button toggle = new Button(enabled ? "停用" : "启用", e -> {
-            user.setStatus(enabled ? 1 : 0);
-            userService.updateById(user);
+            userService.updateStatus(user.getId(), enabled ? 1 : 0);
             refresh();
             Notify.success(enabled ? "用户已停用" : "用户已启用");
         });

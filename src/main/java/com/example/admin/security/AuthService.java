@@ -20,7 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/** 登录认证与当前用户信息 */
+/**
+ * 登录认证与当前用户信息
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -28,8 +30,10 @@ public class AuthService {
     private final SysUserService userService;
     private final SysMenuService menuService;
 
-    /** 登录（先校验验证码），失败抛出 RuntimeException */
-    @OperLog("登录")
+    /**
+     * 登录（先校验验证码），失败抛出 RuntimeException
+     */
+    @OperLog(value = "登录", ignoreParams = true)
     public void login(String username, String password, String captcha) {
         checkCaptcha(captcha);
         SysUser user = userService.lambdaQuery().eq(SysUser::getUsername, username).one();
@@ -47,7 +51,9 @@ public class AuthService {
         tokenSession.set(OnlineUserService.SESSION_LOGIN_TIME, System.currentTimeMillis());
     }
 
-    /** 校验图形验证码（一次性，取出后立即失效，防止重放） */
+    /**
+     * 校验图形验证码（一次性，取出后立即失效，防止重放）
+     */
     private void checkCaptcha(String captcha) {
         WrappedSession session = VaadinSession.getCurrent().getSession();
         String expected = (String) session.getAttribute(CaptchaConfig.CaptchaServlet.SESSION_KEY);
@@ -57,18 +63,24 @@ public class AuthService {
         }
     }
 
-    /** 退出登录 */
+    /**
+     * 退出登录
+     */
     @OperLog("退出登录")
     public void logout() {
         StpUtil.logout();
     }
 
-    /** 当前登录用户 */
+    /**
+     * 当前登录用户
+     */
     public SysUser getCurrentUser() {
         return userService.getById(StpUtil.getLoginIdAsLong());
     }
 
-    /** 当前用户的菜单树（仅目录和菜单，用于侧边导航） */
+    /**
+     * 当前用户的菜单树（仅目录和菜单，用于侧边导航）
+     */
     public List<SysMenu> getCurrentUserMenus() {
         List<SysMenu> menus = menuService.getBaseMapper().selectByUserId(StpUtil.getLoginIdAsLong())
                 .stream()
