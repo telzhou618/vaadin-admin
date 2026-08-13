@@ -61,7 +61,6 @@ public class OperLogView extends VerticalLayout {
         grid.addColumn(l -> l.getCostMs() == null ? "" : l.getCostMs() + " ms").setHeader("耗时")
                 ;
         grid.addColumn(SysOperLog::getErrorMsg).setHeader("错误信息");
-        grid.addColumn(SysOperLog::getParams).setHeader("请求参数");
         grid.addColumn(l -> DateUtil.format(l.getCreateTime(), "yyyy-MM-dd HH:mm:ss")).setHeader("操作时间");
         grid.setSizeFull();
         grid.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
