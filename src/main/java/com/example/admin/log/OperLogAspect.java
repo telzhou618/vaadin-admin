@@ -2,6 +2,7 @@ package com.example.admin.log;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.example.admin.system.entity.SysOperLog;
 import com.example.admin.system.entity.SysUser;
 import com.example.admin.system.service.SysOperLogService;
@@ -33,6 +34,7 @@ public class OperLogAspect {
         record.setOperation(operLog.value());
         record.setIp(clientIp());
         try {
+            record.setParams(JSONUtil.toJsonStr(pjp.getArgs()));
             Object result = pjp.proceed();
             record.setStatus(0);
             return result;

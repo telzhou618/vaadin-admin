@@ -15,6 +15,9 @@ public class SysOperLog extends BaseEntity {
     /** 操作描述，如 保存用户 */
     private String operation;
 
+    /** 请求参数 */
+    private String params;
+
     /** 操作 IP */
     private String ip;
 

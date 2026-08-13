@@ -90,6 +90,7 @@ create table sys_oper_log (
     id          bigint auto_increment primary key comment '主键',
     username    varchar(50)  null comment '操作人',
     operation   varchar(100) null comment '操作描述',
+    params      text         null comment '请求参数',
     ip          varchar(50)  null comment '操作 IP',
     status      tinyint      not null default 0 comment '状态：0 成功 1 失败',
     error_msg   varchar(500) null comment '错误信息',
